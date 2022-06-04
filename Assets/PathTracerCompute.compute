@@ -1,0 +1,192 @@
+#pragma kernel CSMain
+
+static const float PI = 3.14159265f;
+static const float MAXHASH = 4294967295.0f;
+uint seed;
+uint2 pixel;
+uint currSample;
+uint texWidth, texHeight;
+
+float Rand(){
+    uint value = pixel.y * texWidth + pixel.x;
+    value *= seed;
+    value ^= 2747636419u;
+    value *= 2654435769u;
+    value ^= value >> 16;
+    value *= 2654435769u;
+    value ^= value >> 16;
+    value *= 2654435769u;
+    seed++;
+    return (float)value / MAXHASH;
+}
+float rand(){
+    float result = frac(sin(seed / 100.0f * dot(pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
+    seed += 1.0f;
+    return result;
+}
+
+float sdot(float3 a, float3 b, float alpha = 1.0f){
+    return saturate(dot(a, b) * alpha);
+}
+
+float3 RandInUnitSphere(){
+    while (true){
+        float x = Rand() * 2.0f - 1.0f;
+        float y = Rand() * 2.0f - 1.0f;
+        float z = Rand() * 2.0f - 1.0f;
+
+        if (length(float3(x, y, z)) <= 1){
+            return float3(x, y, z);
+        }
+    }
+    return float3(0, 0, 0);
+}
+
+float4x4 cameraToWorld;
+float4x4 cameraInverseProjection;
+float3 camPos;
+uint maxDepth;
+
+Texture2D<float4> _enviromentTex;
+SamplerState sampler_enviromentTex;
+RWStructuredBuffer<float3> pixels;
+RWTexture2D<float4> tex;
+
+class Ray{
+    float3 origin, dir;
+
+    float3 At(float t){
+        return origin + t * dir;
+    }
+
+    static Ray Create(float3 origin, float3 dir){
+        Ray ray;
+        ray.origin = origin;
+        ray.dir = dir;
+        return ray;
+    }
+};
+
+struct Camera{
+    static Ray GetRay(float2 uv){
+        // Transform the camera origin to world space
+        float3 origin = mul(cameraToWorld, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+        
+        // Invert the perspective projection of the view-space position
+        float3 direction = mul(cameraInverseProjection, float4(uv, 0.0f, 1.0f)).xyz;
+        // Transform the direction from camera to world space and normalize
+        direction = mul(cameraToWorld, float4(direction, 0.0f)).xyz;
+        direction = normalize(direction);
+
+        return Ray::Create(camPos, direction);
+    }
+};
+
+struct HitRecord{
+    bool didHit;
+    float t;
+    float3 pos;
+    float3 normal;
+    float3 albedo;
+    float specChance;
+    float metalness;
+    float roughness;
+    float3 emission;
+};
+
+class Sphere{
+    float3 center;
+    float radius;
+    float3 albedo;
+    float specChance;
+    float metalness;
+    float roughness;
+    float3 emission;
+
+    HitRecord Hit(Ray ray, float tMin, float tMax){
+        float3 oc = ray.origin - center;
+        float a = dot(ray.dir, ray.dir);
+        float half_b = dot(oc, ray.dir);
+        float c = dot(oc, oc) - radius * radius;
+        float discriminant = half_b * half_b - a * c;
+        float root = (-half_b - sqrt(discriminant)) / a;
+        HitRecord rec;
+        if (discriminant < 0.0f || root < tMin || root > tMax){
+            rec.didHit = false;
+            return rec;
+        }
+        rec.didHit = true;
+        rec.t = root;
+        rec.pos = ray.At(rec.t);
+        rec.normal = (rec.pos - center) / radius;
+        rec.albedo = albedo;
+        rec.specChance = specChance;
+        rec.metalness = metalness;
+        rec.roughness = roughness;
+        rec.emission = emission;
+        return rec;
+    }
+};
+
+RWStructuredBuffer<Sphere> spheres;
+uint sphereCount;
+
+
+float3 SampleEnviroment(Ray ray){
+    float theta = acos(ray.dir.y) / -PI;
+    float phi = atan2(ray.dir.x, -ray.dir.z) / -PI * 0.5f;
+    float4 _sample = _enviromentTex.SampleLevel(sampler_enviromentTex, float2(phi, theta), 0);
+    return float3(_sample.x, _sample.y, _sample.z);
+    //return float3(0, 0, 0);
+}
+
+float3 GetPixelColor(Ray ray, float tMin, float tMax){
+    float3 color = float3(1, 1, 1);
+    for (uint depth = 1; depth <= maxDepth; depth++){
+        HitRecord rec;
+        rec.t = tMax;
+
+        for (uint i = 0; i < sphereCount; i++){
+            Sphere sphere = spheres[i];
+            HitRecord tempRec = sphere.Hit(ray, tMin, rec.t);
+
+            if (tempRec.didHit){
+                rec = tempRec;
+            }
+        }
+        if (rec.t == 1.#INF){
+            color *= SampleEnviroment(ray);
+            break;
+        }
+
+        float3 newDir;
+        float3 specularDir = reflect(ray.dir, rec.normal) + rec.roughness * RandInUnitSphere();
+        float3 diffuseDir = rec.normal + normalize(RandInUnitSphere());
+        float specularIntensity = pow(1.0f - sdot(rec.normal, specularDir), 2.5f) + rec.metalness;
+
+        if (Rand() <= rec.specChance * specularIntensity){
+            newDir = specularDir;
+            color *= lerp(1, rec.albedo, rec.metalness);
+        }
+        else{
+            newDir = diffuseDir;
+            color *= rec.albedo;
+        }
+
+
+        ray = Ray::Create(rec.pos + rec.normal * 0.0001f, newDir);
+        if (length(rec.emission) != 0.0f) break;
+    }
+    return color;
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    pixel = id.xy;
+    if (currSample == 1) pixels[id.y * texWidth + id.x] = float3(0, 0, 0);
+    float2 uv = float2(((float)id.x + Rand()) / (texWidth - 1), ((float)id.y + Rand()) / (texHeight - 1)) * 2.0f - 1.0f;
+    Ray ray = Camera::GetRay(uv);
+    pixels[id.y * texWidth + id.x] += pow(GetPixelColor(ray, 0, 1.#INF), 2.0f);
+    tex[id.xy] = sqrt(float4(pixels[id.y * texWidth + id.x] / (float)currSample, 1));
+}
