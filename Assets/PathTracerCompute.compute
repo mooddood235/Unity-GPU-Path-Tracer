@@ -162,7 +162,9 @@ float3 GetPixelColor(Ray ray, float tMin, float tMax){
         float3 newDir;
         float3 specularDir = reflect(ray.dir, rec.normal) + rec.roughness * RandInUnitSphere();
         float3 diffuseDir = rec.normal + normalize(RandInUnitSphere());
-        float specularIntensity = pow(1.0f - sdot(rec.normal, specularDir), 2.5f) + rec.metalness;
+
+        float fresnel = 1.0f - sdot(rec.normal, specularDir);
+        float specularIntensity = pow(abs((1.0f-(1.0f-rec.metalness)*cos(PI/2.0f * fresnel))/(1.0f+(1.0f-rec.metalness)*cos(PI/2.0f*fresnel))), 2.0f);
 
         if (Rand() <= rec.specChance * specularIntensity){
             newDir = specularDir;
