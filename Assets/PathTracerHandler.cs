@@ -55,7 +55,7 @@ public class PathTracerHandler : MonoBehaviour
 
         pathTracerCompute.SetTexture(0, "tex", renderTexture);
 
-        ComputeBuffer spheresCB = new ComputeBuffer(spheres.Count, 13 * sizeof(float));
+        ComputeBuffer spheresCB = new ComputeBuffer(spheres.Count + 1, 13 * sizeof(float));
         Sphere.Data[] sphereDatas = new Sphere.Data[spheres.Count];
         for (int i = 0; i < spheres.Count; i++){
             sphereDatas[i] = spheres[i].GetData();
@@ -68,9 +68,9 @@ public class PathTracerHandler : MonoBehaviour
         List<int> tris = new List<int>();
         GetMeshInfo(meshObjectDatas, verts, tris);
 
-        ComputeBuffer meshObjectDatasCB = new ComputeBuffer(meshObjects.Count, 15 * sizeof(float) + 2 * sizeof(int));
-        ComputeBuffer vertsCB = new ComputeBuffer(verts.Count, 3 * sizeof(float));
-        ComputeBuffer trisCB = new ComputeBuffer(tris.Count, sizeof(int));
+        ComputeBuffer meshObjectDatasCB = new ComputeBuffer(meshObjects.Count + 1, 18 * sizeof(float) + 2 * sizeof(int));
+        ComputeBuffer vertsCB = new ComputeBuffer(verts.Count + 1, 3 * sizeof(float));
+        ComputeBuffer trisCB = new ComputeBuffer(tris.Count + 1, sizeof(int));
 
         meshObjectDatasCB.SetData(meshObjectDatas);
         vertsCB.SetData(verts);
@@ -106,6 +106,12 @@ public class PathTracerHandler : MonoBehaviour
         currSample++;
     }
     private void OnValidate() {
+        foreach (Sphere sphere in spheres){
+            sphere.pathTracerHandler = this;
+        }
+        foreach (MeshObject meshObject in meshObjects){
+            meshObject.pathTracerHandler = this;
+        }
         ResetCurrSample();
     }
 

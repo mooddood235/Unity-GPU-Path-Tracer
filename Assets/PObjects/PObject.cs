@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(Transform))] 
 public class PObject : MonoBehaviour
 {
-    [SerializeField] protected PathTracerHandler pathTracerHandler;
+    [HideInInspector] public PathTracerHandler pathTracerHandler;
     [SerializeField] protected Color albedo;
     [SerializeField] [Range(0f, 1f)] protected float specChance;
     [SerializeField] [Range(0f, 1f)] protected float metalness;
@@ -13,18 +13,23 @@ public class PObject : MonoBehaviour
     [SerializeField] protected Vector3 emission;
     protected Vector3 previousPos;
     protected Vector3 previousScale;
+    protected Quaternion previousRot;
 
     private void Awake() {
         previousPos = transform.position;
+        previousScale = transform.localScale;
+        previousRot = transform.rotation;
     }
     private void Update() {
-        if (transform.position != previousPos || transform.localScale != previousScale){
+        if (transform.position != previousPos || transform.localScale != previousScale || transform.rotation != previousRot){
             pathTracerHandler.ResetCurrSample();
             previousPos = transform.position;
             previousScale = transform.localScale;
+            previousRot = transform.rotation;
         }
     }
     private void OnValidate() {
-        pathTracerHandler.ResetCurrSample();
+        if (pathTracerHandler != null)
+            pathTracerHandler.ResetCurrSample();
     }
 }
