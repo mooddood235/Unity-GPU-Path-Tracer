@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 [RequireComponent(typeof(Camera))]
 public class PathTracerHandler : MonoBehaviour
@@ -23,6 +24,7 @@ public class PathTracerHandler : MonoBehaviour
     [SerializeField] private uint currSample;
     [Space]
     [SerializeField] private List<Sphere> spheres;
+    [SerializeField] private List<MeshObject> meshObjects;
     private void Awake() {
         pixels = new Vector3[width * height];
         currSample = 1;
@@ -36,7 +38,7 @@ public class PathTracerHandler : MonoBehaviour
         renderTexture.enableRandomWrite = true;
     }
     private void Dispatch(){
-        seed = (uint)Random.Range(200, 50000);
+        seed = (uint)Random.Range(200, 100000);
         pathTracerCompute.SetInt("texWidth", (int)width);
         pathTracerCompute.SetInt("texHeight", (int)height);
         pathTracerCompute.SetMatrix("cameraToWorld", cam.cameraToWorldMatrix);
@@ -59,14 +61,33 @@ public class PathTracerHandler : MonoBehaviour
             sphereDatas[i] = spheres[i].GetData();
         }
         spheresCB.SetData(sphereDatas);
-        
         pathTracerCompute.SetInt("sphereCount", spheres.Count);
 
+        List<MeshObject.Data> meshObjectDatas = new List<MeshObject.Data>();
+        List<Vector3> verts = new List<Vector3>();
+        List<int> tris = new List<int>();
+        GetMeshInfo(meshObjectDatas, verts, tris);
+
+        ComputeBuffer meshObjectDatasCB = new ComputeBuffer(meshObjects.Count, 15 * sizeof(float) + 2 * sizeof(int));
+        ComputeBuffer vertsCB = new ComputeBuffer(verts.Count, 3 * sizeof(float));
+        ComputeBuffer trisCB = new ComputeBuffer(tris.Count, sizeof(int));
+
+        meshObjectDatasCB.SetData(meshObjectDatas);
+        vertsCB.SetData(verts);
+        trisCB.SetData(tris);
+        pathTracerCompute.SetBuffer(0, "meshObjects", meshObjectDatasCB);
+        pathTracerCompute.SetBuffer(0, "verts", vertsCB);
+        pathTracerCompute.SetBuffer(0, "tris", trisCB);
+        pathTracerCompute.SetInt("meshObjectCount", meshObjects.Count);        
+
         pathTracerCompute.SetBuffer(0, "spheres", spheresCB);
-        pathTracerCompute.Dispatch(0, (int)width / 8, (int)height / 8, 1);
+        pathTracerCompute.Dispatch(0, (int)width / 30, (int)height / 30, 1);
         pixelsCB.GetData(pixels);
         pixelsCB.Dispose();
         spheresCB.Dispose();
+        meshObjectDatasCB.Dispose();
+        vertsCB.Dispose();
+        trisCB.Dispose();
     }
 
     public void ResetCurrSample(){
@@ -86,5 +107,11 @@ public class PathTracerHandler : MonoBehaviour
     }
     private void OnValidate() {
         ResetCurrSample();
+    }
+
+    private void GetMeshInfo(List<MeshObject.Data> meshObjectDatas, List<Vector3> verts, List<int> tris){
+        foreach (MeshObject meshObject in meshObjects){
+            meshObjectDatas.Add(meshObject.GetData(verts, tris));
+        }
     }
 }
