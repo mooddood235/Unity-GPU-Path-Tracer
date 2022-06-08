@@ -101,6 +101,8 @@ uint maxDepth;
 
 Texture2D<float4> _enviromentTex;
 SamplerState sampler_enviromentTex;
+float3 enviromentColor;
+bool useColor;
 RWStructuredBuffer<float3> pixels;
 RWTexture2D<float4> tex;
 RWStructuredBuffer<float3> verts;
@@ -286,7 +288,7 @@ float3 SampleEnviroment(Ray ray){
     float theta = acos(ray.dir.y) / -PI;
     float phi = atan2(ray.dir.x, -ray.dir.z) / -PI * 0.5f;
     float4 _sample = _enviromentTex.SampleLevel(sampler_enviromentTex, float2(phi, theta), 0);
-    return float3(_sample.x, _sample.y, _sample.z);
+    return useColor ? enviromentColor : float3(_sample.x, _sample.y, _sample.z);
 }
 
 float3 GetPixelColor(Ray ray, float tMin, float tMax){
@@ -335,7 +337,8 @@ float3 GetPixelColor(Ray ray, float tMin, float tMax){
             attenuation = rec.albedo;
         }
 
-        color = rec.emission + color * attenuation;
+        color *= rec.emission + attenuation;
+        if (length(rec.emission) != 0.0f) break;
         ray = Ray::Create(rec.pos + rec.normal * 0.0001f, newDir);
     }
     return color;

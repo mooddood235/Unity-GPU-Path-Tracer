@@ -12,8 +12,15 @@ public class PathTracerHandler : MonoBehaviour
     private Camera cam;
     private RenderTexture renderTexture;
     private Vector3[] pixels;
+    [SerializeField] private bool save;
+    [SerializeField] private string fileName;
+    private string previousFileName;
+    [Space]
     [SerializeField] private ComputeShader pathTracerCompute;
+    [Space]
     [SerializeField] Texture enviromentTexture;
+    [SerializeField] private Color enviromentColor;
+    [SerializeField] private bool useColor;
     [Space]
     [SerializeField] private uint width;
     [SerializeField] private uint height;
@@ -26,6 +33,7 @@ public class PathTracerHandler : MonoBehaviour
     [SerializeField] private List<Sphere> spheres;
     [SerializeField] private List<MeshObject> meshObjects;
     private void Awake() {
+        previousFileName = fileName;
         pixels = new Vector3[width * height];
         currSample = 1;
         previousPos = transform.position;
@@ -48,6 +56,8 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetInt("seed", (int)seed);
         pathTracerCompute.SetInt("currSample", (int)currSample);
         pathTracerCompute.SetTexture(0, "_enviromentTex", enviromentTexture);
+        pathTracerCompute.SetVector("enviromentColor", new Vector3(enviromentColor.r, enviromentColor.g, enviromentColor.b));
+        pathTracerCompute.SetBool("useColor", useColor);
 
         ComputeBuffer pixelsCB = new ComputeBuffer((int)(width * height), 3 * sizeof(float));
         pixelsCB.SetData(pixels);
@@ -94,6 +104,11 @@ public class PathTracerHandler : MonoBehaviour
         currSample = 1;
     }
     private void OnRenderImage(RenderTexture src, RenderTexture dest) {
+        if (save){
+            save = false;
+            if (fileName != "") ScreenCapture.CaptureScreenshot(fileName + ".png");
+        }
+
         if (previousFocalLength != cam.focalLength || transform.position != previousPos || transform.rotation != previousRot){
             ResetCurrSample();
             previousFocalLength = cam.focalLength;
@@ -106,6 +121,10 @@ public class PathTracerHandler : MonoBehaviour
         currSample++;
     }
     private void OnValidate() {
+        if (save || fileName != previousFileName){
+            previousFileName = fileName;
+            return;
+        }
         foreach (Sphere sphere in spheres){
             sphere.pathTracerHandler = this;
         }
