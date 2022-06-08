@@ -64,6 +64,36 @@ float3 SampleHemisphere(float3 normal)
     return mul(tangentSpaceDir, GetTangentSpace(normal));
 }
 
+float3 RotateFloat3(float3 v, float3 angles){
+    angles *= -1;
+    float sinX = sin(angles.x);
+    float cosX = cos(angles.x); 
+
+    float sinY = sin(angles.y);
+    float cosY = cos(angles.y);
+
+    float sinZ = sin(angles.z);
+    float cosZ = cos(angles.z);
+
+    float3x3 xRotator = float3x3(
+        1, 0, 0,
+        0, cosX, -sinX,
+        0, sinX, cosX
+    );
+    float3x3 yRotator = float3x3(
+        cosY, 0, sinY,
+        0, 1, 0,
+        -sinY, 0, cosY
+    );
+    float3x3 zRotator = float3x3(
+        cosZ, -sinZ, 0,
+        sinZ, cosZ, 0,
+        0, 0, 1
+    );
+    float3x3 generalRotator = mul(mul(zRotator, xRotator), yRotator);
+    return mul(v, generalRotator);
+}
+
 float4x4 cameraToWorld;
 float4x4 cameraInverseProjection;
 float3 camPos;
@@ -225,11 +255,10 @@ class MeshObject{
         HitRecord rec; 
         rec.didHit = false;
         rec.t = tMax;
-
         for (int i = trisStart; i <= trisEnd; i += 3){
-            float3 vert0 = verts[tris[i]] * scale + pos;
-            float3 vert1 = verts[tris[i + 1]] * scale + pos;
-            float3 vert2 = verts[tris[i + 2]] * scale + pos;
+            float3 vert0 = RotateFloat3(verts[tris[i]], rotation * PI / 180.0f) * scale + pos;
+            float3 vert1 = RotateFloat3(verts[tris[i + 1]], rotation * PI / 180.0f) * scale + pos;
+            float3 vert2 = RotateFloat3(verts[tris[i + 2]], rotation * PI / 180.0f) * scale + pos;
 
             Triangle tri = Triangle::Create(vert0, vert1, vert2);
             HitRecord tempRec = tri.Hit(ray, tMin, tMax);
