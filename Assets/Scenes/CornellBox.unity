@@ -833,17 +833,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04abdf6fd4c6c68489d8fa9c08880d9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  save: 0
-  fileName: CornellBoxRender
+  saveRender: 0
+  saveNormals: 0
+  saveAlbedo: 0
+  fileName: Render.png
   pathTracerCompute: {fileID: 7200000, guid: a7dfe1f3a73a5714b9e7fe71c5616211, type: 3}
   enviromentTexture: {fileID: 2800000, guid: 926961ad77bc6824ea5ce0f07c684df0, type: 3}
   enviromentColor: {r: 0, g: 0, b: 0, a: 0}
   useColor: 1
-  width: 1920
-  height: 1920
+  width: 600
+  height: 600
   maxDepth: 50
   seed: 0
-  samples: 5000
+  samples: 8000
   currSample: 1
   spheres:
   - {fileID: 2105618547}

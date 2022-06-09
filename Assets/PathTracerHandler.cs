@@ -11,8 +11,12 @@ public class PathTracerHandler : MonoBehaviour
     Quaternion previousRot;
     private Camera cam;
     private RenderTexture renderTexture;
-    private Vector3[] pixels;
-    [SerializeField] private bool save;
+    private RenderTexture normalsTexture;
+    private RenderTexture albedoTexture;
+    private Matrix4x4[] pixels;
+    [SerializeField] private bool saveRender;
+    [SerializeField] private bool saveNormals;
+    [SerializeField] private bool saveAlbedo;
     [SerializeField] private string fileName;
     private string previousFileName;
     [Space]
@@ -34,16 +38,31 @@ public class PathTracerHandler : MonoBehaviour
     [SerializeField] private List<MeshObject> meshObjects;
     private void Awake() {
         previousFileName = fileName;
-        pixels = new Vector3[width * height];
+
+        pixels = new Matrix4x4[width * height];
+
         currSample = 1;
+
         previousPos = transform.position;
         previousRot = transform.rotation;
+
         cam = GetComponent<Camera>();
         previousFocalLength = cam.focalLength;
+
         renderTexture = new RenderTexture((int)width, (int)height, 0);
         renderTexture.format = RenderTextureFormat.ARGBFloat;
         renderTexture.filterMode = FilterMode.Point;
         renderTexture.enableRandomWrite = true;
+
+        normalsTexture = new RenderTexture((int)width, (int)height, 0);
+        normalsTexture.format = RenderTextureFormat.ARGBFloat;
+        normalsTexture.filterMode = FilterMode.Point;
+        normalsTexture.enableRandomWrite = true;
+
+        albedoTexture = new RenderTexture((int)width, (int)height, 0);
+        albedoTexture.format = RenderTextureFormat.ARGBFloat;
+        albedoTexture.filterMode = FilterMode.Point;
+        albedoTexture.enableRandomWrite = true;
     }
     private void Dispatch(){
         seed = (uint)Random.Range(200, 100000);
@@ -55,15 +74,18 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetInt("maxDepth", (int)maxDepth);
         pathTracerCompute.SetInt("seed", (int)seed);
         pathTracerCompute.SetInt("currSample", (int)currSample);
+        pathTracerCompute.SetInt("samples", (int)samples);
         pathTracerCompute.SetTexture(0, "_enviromentTex", enviromentTexture);
         pathTracerCompute.SetVector("enviromentColor", new Vector3(enviromentColor.r, enviromentColor.g, enviromentColor.b));
         pathTracerCompute.SetBool("useColor", useColor);
 
-        ComputeBuffer pixelsCB = new ComputeBuffer((int)(width * height), 3 * sizeof(float));
+        ComputeBuffer pixelsCB = new ComputeBuffer((int)(width * height), 16 * sizeof(float));
         pixelsCB.SetData(pixels);
         pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
 
-        pathTracerCompute.SetTexture(0, "tex", renderTexture);
+        pathTracerCompute.SetTexture(0, "renderTex", renderTexture);
+        pathTracerCompute.SetTexture(0, "normalsTex", normalsTexture);
+        pathTracerCompute.SetTexture(0, "albedoTex", albedoTexture);
 
         ComputeBuffer spheresCB = new ComputeBuffer(spheres.Count + 1, 13 * sizeof(float));
         Sphere.Data[] sphereDatas = new Sphere.Data[spheres.Count];
@@ -104,9 +126,11 @@ public class PathTracerHandler : MonoBehaviour
         currSample = 1;
     }
     private void OnRenderImage(RenderTexture src, RenderTexture dest) {
-        if (save){
-            save = false;
-            if (fileName != "") ScreenCapture.CaptureScreenshot(fileName + ".png");
+        if (saveRender || saveNormals || saveAlbedo){
+            SaveRender();
+            saveRender = false;
+            saveNormals = false;
+            saveAlbedo = false;
         }
 
         if (previousFocalLength != cam.focalLength || transform.position != previousPos || transform.rotation != previousRot){
@@ -121,7 +145,7 @@ public class PathTracerHandler : MonoBehaviour
         currSample++;
     }
     private void OnValidate() {
-        if (save || fileName != previousFileName){
+        if (saveRender || saveNormals || saveAlbedo || fileName != previousFileName){
             previousFileName = fileName;
             return;
         }
@@ -138,5 +162,18 @@ public class PathTracerHandler : MonoBehaviour
         foreach (MeshObject meshObject in meshObjects){
             meshObjectDatas.Add(meshObject.GetData(verts, tris));
         }
+    }
+    private void SaveRender(){
+        if (fileName == "") return;
+
+        RenderTexture.active = renderTexture;
+        if (saveNormals) RenderTexture.active = normalsTexture;
+        else if (saveAlbedo) RenderTexture.active = albedoTexture;
+
+        Texture2D tex = new Texture2D((int)width, (int)height);
+        tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        RenderTexture.active = null;
+
+        System.IO.File.WriteAllBytes(fileName, tex.EncodeToPNG());
     }
 }
