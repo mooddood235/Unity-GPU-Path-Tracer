@@ -13,7 +13,7 @@ public class PathTracerHandler : MonoBehaviour
     private RenderTexture renderTexture;
     private RenderTexture normalsTexture;
     private RenderTexture albedoTexture;
-    private Matrix4x4[] pixels;
+    private Matrix3x3[] pixels;
     [SerializeField] private bool saveRender;
     [SerializeField] private bool saveNormals;
     [SerializeField] private bool saveAlbedo;
@@ -41,7 +41,7 @@ public class PathTracerHandler : MonoBehaviour
     private void Awake() {
         previousFileName = fileName;
 
-        pixels = new Matrix4x4[width * height];
+        pixels = new Matrix3x3[width * height];
 
         currSample = 1;
 
@@ -66,7 +66,7 @@ public class PathTracerHandler : MonoBehaviour
         albedoTexture.filterMode = FilterMode.Point;
         albedoTexture.enableRandomWrite = true;
 
-        pixelsCB = new ComputeBuffer((int)(width * height), 16 * sizeof(float));
+        pixelsCB = new ComputeBuffer((int)(width * height), 9 * sizeof(float));
         pixelsCB.SetData(pixels);
         pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
     }

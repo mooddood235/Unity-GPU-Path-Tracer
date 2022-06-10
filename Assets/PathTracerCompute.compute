@@ -26,11 +26,6 @@ float Rand(){
     seed++;
     return (float)value / MAXHASH;
 }
-float rand(){
-    float result = frac(sin(seed / 100.0f * dot(pixel, float2(12.9898f, 78.233f))) * 43758.5453f);
-    seed += 1.0f;
-    return result;
-}
 
 float sdot(float3 a, float3 b, float alpha = 1.0f){
     return saturate(dot(a, b) * alpha);
@@ -110,7 +105,7 @@ Texture2D<float4> _enviromentTex;
 SamplerState sampler_enviromentTex;
 float3 enviromentColor;
 bool useColor;
-RWStructuredBuffer<float4x4> pixels;
+RWStructuredBuffer<float3x3> pixels;
 RWTexture2D<float4> renderTex;
 RWTexture2D<float4> normalsTex;
 RWTexture2D<float4> albedoTex;
@@ -375,14 +370,11 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float2 uv = float2(((float)id.x + Rand()) / (texWidth), ((float)id.y + Rand()) / (texHeight)) * 2.0f - 1.0f;
     Ray ray = Camera::GetRay(uv);
     float3x3 colors = GetPixelColors(ray, 0, 1.#INF);
-    float4 renderColor = float4(colors[0], 1);
-    float4 normalColor = float4(colors[1], 1);
-    float4 albedoColor = float4(colors[2], 1);
 
-    pixels[i][0] += renderColor;
-    pixels[i][1] += normalColor;
-    pixels[i][2] += albedoColor;
-    renderTex[id.xy] = pixels[i][0] / (float)currSample;
-    normalsTex[id.xy] = pixels[i][1] / (float)currSample;
-    albedoTex[id.xy] = pixels[i][2] / (float)currSample;
+    pixels[i][0] += colors[0];
+    pixels[i][1] += colors[1];
+    pixels[i][2] += colors[2];
+    renderTex[id.xy] = float4(pixels[i][0] / (float)currSample, 1);
+    normalsTex[id.xy] = float4(pixels[i][1] / (float)currSample, 1);
+    albedoTex[id.xy] = float4(pixels[i][2] / (float)currSample, 1);
 }
