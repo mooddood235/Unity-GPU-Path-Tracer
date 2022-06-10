@@ -36,6 +36,8 @@ public class PathTracerHandler : MonoBehaviour
     [Space]
     [SerializeField] private List<Sphere> spheres;
     [SerializeField] private List<MeshObject> meshObjects;
+    ComputeBuffer pixelsCB;
+
     private void Awake() {
         previousFileName = fileName;
 
@@ -63,6 +65,10 @@ public class PathTracerHandler : MonoBehaviour
         albedoTexture.format = RenderTextureFormat.ARGBFloat;
         albedoTexture.filterMode = FilterMode.Point;
         albedoTexture.enableRandomWrite = true;
+
+        pixelsCB = new ComputeBuffer((int)(width * height), 16 * sizeof(float));
+        pixelsCB.SetData(pixels);
+        pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
     }
     private void Dispatch(){
         seed = (uint)Random.Range(200, 100000);
@@ -78,10 +84,6 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetTexture(0, "_enviromentTex", enviromentTexture);
         pathTracerCompute.SetVector("enviromentColor", new Vector3(enviromentColor.r, enviromentColor.g, enviromentColor.b));
         pathTracerCompute.SetBool("useColor", useColor);
-
-        ComputeBuffer pixelsCB = new ComputeBuffer((int)(width * height), 16 * sizeof(float));
-        pixelsCB.SetData(pixels);
-        pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
 
         pathTracerCompute.SetTexture(0, "renderTex", renderTexture);
         pathTracerCompute.SetTexture(0, "normalsTex", normalsTexture);
@@ -113,13 +115,12 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetInt("meshObjectCount", meshObjects.Count);        
 
         pathTracerCompute.SetBuffer(0, "spheres", spheresCB);
+
         pathTracerCompute.Dispatch(0, (int)width / 30, (int)height / 30, 1);
-        pixelsCB.GetData(pixels);
-        pixelsCB.Dispose();
-        spheresCB.Dispose();
-        meshObjectDatasCB.Dispose();
-        vertsCB.Dispose();
-        trisCB.Dispose();
+        spheresCB.Release();
+        meshObjectDatasCB.Release();
+        vertsCB.Release();
+        trisCB.Release();
     }
 
     public void ResetCurrSample(){
@@ -175,5 +176,9 @@ public class PathTracerHandler : MonoBehaviour
         RenderTexture.active = null;
 
         System.IO.File.WriteAllBytes(fileName, tex.EncodeToPNG());
+    }
+
+    private void OnApplicationQuit() {
+        pixelsCB.Release();
     }
 }

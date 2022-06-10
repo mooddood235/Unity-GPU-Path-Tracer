@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -841,8 +841,8 @@ MonoBehaviour:
   enviromentTexture: {fileID: 2800000, guid: 926961ad77bc6824ea5ce0f07c684df0, type: 3}
   enviromentColor: {r: 0, g: 0, b: 0, a: 0}
   useColor: 1
-  width: 600
-  height: 600
+  width: 1080
+  height: 1080
   maxDepth: 50
   seed: 0
   samples: 8000

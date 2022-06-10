@@ -1,14 +1,19 @@
 #pragma kernel CSMain
 
+// Constants
 static const float PI = 3.14159265f;
 static const float EPSILON = 1e-8;
 static const float MAXHASH = 4294967295.0f;
+// --------------------
+
 uint seed;
 uint2 pixel;
 uint currSample;
 uint samples;
+uint maxDepth;
 uint texWidth, texHeight;
 
+// Helper functions
 float Rand(){
     uint value = pixel.y * texWidth + pixel.x;
     value *= seed;
@@ -94,12 +99,13 @@ float3 RotateFloat3(float3 v, float3 angles){
     float3x3 generalRotator = mul(mul(zRotator, xRotator), yRotator);
     return mul(v, generalRotator);
 }
-
+// ---------------
+// Camera stuff
 float4x4 cameraToWorld;
 float4x4 cameraInverseProjection;
 float3 camPos;
-uint maxDepth;
-
+// ------------
+// Buffers and textures
 Texture2D<float4> _enviromentTex;
 SamplerState sampler_enviromentTex;
 float3 enviromentColor;
@@ -108,10 +114,10 @@ RWStructuredBuffer<float4x4> pixels;
 RWTexture2D<float4> renderTex;
 RWTexture2D<float4> normalsTex;
 RWTexture2D<float4> albedoTex;
-RWStructuredBuffer<float3> verts;
-RWStructuredBuffer<int> tris;
+StructuredBuffer<float3> verts;
+StructuredBuffer<int> tris;
 uint trisCount;
-
+// ------------
 class Ray{
     float3 origin, dir;
 
@@ -282,11 +288,12 @@ class MeshObject{
     }
 };
 
+// Hittable Objects
 RWStructuredBuffer<Sphere> spheres;
 uint sphereCount;
 RWStructuredBuffer<MeshObject> meshObjects;
 uint meshObjectCount;
-
+// -----------
 float3 SampleEnviroment(Ray ray){
     float theta = acos(ray.dir.y) / -PI;
     float phi = atan2(ray.dir.x, -ray.dir.z) / -PI * 0.5f;
