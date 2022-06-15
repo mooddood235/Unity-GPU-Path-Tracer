@@ -65,35 +65,6 @@ float3 SampleHemisphere(float3 normal)
     return mul(tangentSpaceDir, GetTangentSpace(normal));
 }
 
-float3 RotateFloat3(float3 v, float3 angles){
-    angles *= -1;
-    float sinX = sin(angles.x);
-    float cosX = cos(angles.x); 
-
-    float sinY = sin(angles.y);
-    float cosY = cos(angles.y);
-
-    float sinZ = sin(angles.z);
-    float cosZ = cos(angles.z);
-
-    float3x3 xRotator = float3x3(
-        1, 0, 0,
-        0, cosX, -sinX,
-        0, sinX, cosX
-    );
-    float3x3 yRotator = float3x3(
-        cosY, 0, sinY,
-        0, 1, 0,
-        -sinY, 0, cosY
-    );
-    float3x3 zRotator = float3x3(
-        cosZ, -sinZ, 0,
-        sinZ, cosZ, 0,
-        0, 0, 1
-    );
-    float3x3 generalRotator = mul(mul(zRotator, xRotator), yRotator);
-    return mul(v, generalRotator);
-}
 // ---------------
 // Camera stuff
 float4x4 cameraToWorld;
@@ -109,9 +80,6 @@ RWStructuredBuffer<float3x3> pixels;
 RWTexture2D<float4> renderTex;
 RWTexture2D<float4> normalsTex;
 RWTexture2D<float4> albedoTex;
-StructuredBuffer<float3> verts;
-StructuredBuffer<int> tris;
-uint trisCount;
 // ------------
 class Ray{
     float3 origin, dir;
@@ -148,46 +116,8 @@ struct HitRecord{
     float t;
     float3 pos;
     float3 normal;
-    float3 albedo;
-    float specChance;
-    float metalness;
-    float roughness;
-    float3 emission;
 };
 
-class Sphere{
-    float3 center;
-    float radius;
-    float3 albedo;
-    float specChance;
-    float metalness;
-    float roughness;
-    float3 emission;
-
-    HitRecord Hit(Ray ray, float tMin, float tMax){
-        float3 oc = ray.origin - center;
-        float a = dot(ray.dir, ray.dir);
-        float half_b = dot(oc, ray.dir);
-        float c = dot(oc, oc) - radius * radius;
-        float discriminant = half_b * half_b - a * c;
-        float root = (-half_b - sqrt(discriminant)) / a;
-        HitRecord rec;
-        if (discriminant < 0.0f || root < tMin || root > tMax){
-            rec.didHit = false;
-            return rec;
-        }
-        rec.didHit = true;
-        rec.t = root;
-        rec.pos = ray.At(rec.t);
-        rec.normal = (rec.pos - center) / radius;
-        rec.albedo = albedo;
-        rec.specChance = specChance;
-        rec.metalness = metalness;
-        rec.roughness = roughness;
-        rec.emission = emission;
-        return rec;
-    }
-};
 class Triangle{
     float3 vert0;
     float3 vert1;
@@ -243,51 +173,58 @@ class Triangle{
     }
 };
 
-class MeshObject{
-    float3 pos;
-    float3 scale;
-    float3 rotation;
+struct AABB{
+    float3 _min;
+    float3 _max;
 
+    HitRecord Hit(Ray ray, float tMin, float tMax){
+        HitRecord rec;
+        rec.didHit = false;
+
+        for (int a = 0; a < 3; a++) {
+            float invD = 1.0f / ray.dir[a];
+            float t0 = (_min[a] - ray.origin[a]) * invD;
+            float t1 = (_max[a] - ray.origin[a]) * invD;
+            if (invD < 0.0f){
+                float tempT0 = t0;
+                t0 = t1;
+                t1 = tempT0;
+            }
+                
+            tMin = t0 > tMin ? t0 : tMin;
+            tMax = t1 < tMax ? t1 : tMax;
+            if (tMax <= tMin) return rec;
+        }
+        rec.didHit = true;
+        return rec;
+    }
+};
+
+struct Material{
     float3 albedo;
     float specChance;
     float metalness;
     float roughness;
     float3 emission;
-
-    int trisStart;
-    int trisEnd;
-
-    HitRecord Hit(Ray ray, float tMin, float tMax){
-        HitRecord rec; 
-        rec.didHit = false;
-        rec.t = tMax;
-        for (int i = trisStart; i <= trisEnd; i += 3){
-            float3 vert0 = RotateFloat3(verts[tris[i]], rotation * PI / 180.0f) * scale + pos;
-            float3 vert1 = RotateFloat3(verts[tris[i + 1]], rotation * PI / 180.0f) * scale + pos;
-            float3 vert2 = RotateFloat3(verts[tris[i + 2]], rotation * PI / 180.0f) * scale + pos;
-
-            Triangle tri = Triangle::Create(vert0, vert1, vert2);
-            HitRecord tempRec = tri.Hit(ray, tMin, tMax);
-
-            if (tempRec.didHit){
-                rec = tempRec;
-            }
-        }
-
-        rec.albedo = albedo;
-        rec.specChance = specChance;
-        rec.metalness = metalness;
-        rec.roughness = roughness;
-        rec.emission = emission;
-        return rec;
-    }
 };
 
-// Hittable Objects
-RWStructuredBuffer<Sphere> spheres;
-uint sphereCount;
-RWStructuredBuffer<MeshObject> meshObjects;
-uint meshObjectCount;
+struct BVHNode{
+    int isBox;
+
+    Triangle tri;
+
+    AABB box;
+
+    int left;
+    int right;
+
+    Material mat;
+};
+
+
+StructuredBuffer<BVHNode> BVH;
+uint BVHCount;
+
 // -----------
 float3 SampleEnviroment(Ray ray){
     float theta = acos(ray.dir.y) / -PI;
@@ -306,52 +243,66 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
         rec.didHit = false;
         rec.t = tMax;
 
-        for (uint i = 0; i < sphereCount; i++){
-            Sphere sphere = spheres[i];
-            HitRecord tempRec = sphere.Hit(ray, tMin, rec.t);
+        Material mat;
 
-            if (tempRec.didHit){
-                rec = tempRec;
+        int stack[100];
+        int stackPnt = 0;
+        stack[stackPnt] = 0;
+
+        while (stackPnt >= 0){
+            BVHNode node = BVH[stack[stackPnt]];
+            stackPnt--;
+
+            if (!node.isBox){
+                HitRecord tempRec = node.tri.Hit(ray, tMin, rec.t);
+
+                if (tempRec.didHit){
+                    rec = tempRec;
+                    mat = node.mat;
+                }
+            }
+            else if (node.box.Hit(ray, tMin, rec.t).didHit){
+                if (node.left != -1){
+                    stackPnt++;
+                    stack[stackPnt] = node.left;
+                }
+                if (node.right != -1){
+                    stackPnt++;
+                    stack[stackPnt] = node.right;
+                }    
             }
         }
-        for (uint j = 0; j < meshObjectCount; j++){
-            MeshObject meshObject = meshObjects[j];
-            HitRecord tempRec = meshObject.Hit(ray, tMin, rec.t);
 
-            if (tempRec.didHit){
-                rec = tempRec;
-            }
-        }
         if (!rec.didHit){
             color *= SampleEnviroment(ray);
             break;
         }
-
+        
         float3 newDir;
-        float3 specularDir = reflect(ray.dir, rec.normal) + rec.roughness * RandInUnitSphere();
+        float3 specularDir = reflect(ray.dir, rec.normal) + mat.roughness * RandInUnitSphere();
         float3 diffuseDir = SampleHemisphere(rec.normal);
 
         float fresnel = 1.0f - sdot(rec.normal, specularDir);
-        float specularIntensity = pow(abs((1.0f-(1.0f-rec.metalness)*cos(PI/2.0f * fresnel))/(1.0f+(1.0f-rec.metalness)*cos(PI/2.0f*fresnel))), 2.0f);
+        float specularIntensity = pow(abs((1.0f-(1.0f-mat.metalness)*cos(PI/2.0f * fresnel))/(1.0f+(1.0f-mat.metalness)*cos(PI/2.0f*fresnel))), 2.0f);
 
         float3 attenuation;
 
-        if (Rand() <= rec.specChance * specularIntensity){
+        if (Rand() <= mat.specChance * specularIntensity){
             newDir = specularDir;
-            attenuation = lerp(1, rec.albedo, rec.metalness);
+            attenuation = lerp(1, mat.albedo, mat.metalness);
         }
         else{
             newDir = diffuseDir;
-            attenuation = rec.albedo;
+            attenuation = mat.albedo;
         }
 
-        color *= rec.emission + attenuation;
+        color *= mat.emission + attenuation;
         if (depth == 1){
             normal = rec.normal;
-            albedo = rec.albedo;
+            albedo = mat.albedo;
         }
         
-        if (length(rec.emission) != 0.0f) break;
+        if (length(mat.emission) != 0.0f) break;
         ray = Ray::Create(rec.pos + rec.normal * 0.0001f, newDir);
     }
     return float3x3(color, normal, albedo);

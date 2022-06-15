@@ -34,9 +34,12 @@ public class PathTracerHandler : MonoBehaviour
     [SerializeField] private uint samples;
     [SerializeField] private uint currSample;
     [Space]
-    [SerializeField] private List<Sphere> spheres;
-    [SerializeField] private List<MeshObject> meshObjects;
-    ComputeBuffer pixelsCB;
+    [SerializeField] private bool showBVH;
+    [Space]
+    private ComputeBuffer pixelsCB;
+    [SerializeField] private List<MeshObj> objs;
+    private ComputeBuffer BVHCB;
+    private List<BVHNode> debug;
 
     private void Awake() {
         previousFileName = fileName;
@@ -70,6 +73,16 @@ public class PathTracerHandler : MonoBehaviour
         pixelsCB.SetData(pixels);
         pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
     }
+    private void Start() {
+        debug = BVHNode.ConstructBVH(objs);
+        List<BVHNode.Blittable> BVH = BVHNode.ConvertToBlittable(debug);
+
+        BVHCB = new ComputeBuffer(BVH.Count, 24 * sizeof(float) + 3 * sizeof(int));
+        BVHCB.SetData(BVH.ToArray());
+
+        pathTracerCompute.SetBuffer(0, "BVH", BVHCB);
+        pathTracerCompute.SetInt("BVHCount", BVH.Count);
+    }
     private void Dispatch(){
         seed = (uint)Random.Range(200, 100000);
         pathTracerCompute.SetInt("texWidth", (int)width);
@@ -89,38 +102,7 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetTexture(0, "normalsTex", normalsTexture);
         pathTracerCompute.SetTexture(0, "albedoTex", albedoTexture);
 
-        ComputeBuffer spheresCB = new ComputeBuffer(spheres.Count + 1, 13 * sizeof(float));
-        Sphere.Data[] sphereDatas = new Sphere.Data[spheres.Count];
-        for (int i = 0; i < spheres.Count; i++){
-            sphereDatas[i] = spheres[i].GetData();
-        }
-        spheresCB.SetData(sphereDatas);
-        pathTracerCompute.SetInt("sphereCount", spheres.Count);
-
-        List<MeshObject.Data> meshObjectDatas = new List<MeshObject.Data>();
-        List<Vector3> verts = new List<Vector3>();
-        List<int> tris = new List<int>();
-        GetMeshInfo(meshObjectDatas, verts, tris);
-
-        ComputeBuffer meshObjectDatasCB = new ComputeBuffer(meshObjects.Count + 1, 18 * sizeof(float) + 2 * sizeof(int));
-        ComputeBuffer vertsCB = new ComputeBuffer(verts.Count + 1, 3 * sizeof(float));
-        ComputeBuffer trisCB = new ComputeBuffer(tris.Count + 1, sizeof(int));
-
-        meshObjectDatasCB.SetData(meshObjectDatas);
-        vertsCB.SetData(verts);
-        trisCB.SetData(tris);
-        pathTracerCompute.SetBuffer(0, "meshObjects", meshObjectDatasCB);
-        pathTracerCompute.SetBuffer(0, "verts", vertsCB);
-        pathTracerCompute.SetBuffer(0, "tris", trisCB);
-        pathTracerCompute.SetInt("meshObjectCount", meshObjects.Count);        
-
-        pathTracerCompute.SetBuffer(0, "spheres", spheresCB);
-
         pathTracerCompute.Dispatch(0, (int)width / 30, (int)height / 30, 1);
-        spheresCB.Release();
-        meshObjectDatasCB.Release();
-        vertsCB.Release();
-        trisCB.Release();
     }
 
     public void ResetCurrSample(){
@@ -150,20 +132,11 @@ public class PathTracerHandler : MonoBehaviour
             previousFileName = fileName;
             return;
         }
-        foreach (Sphere sphere in spheres){
-            sphere.pathTracerHandler = this;
-        }
-        foreach (MeshObject meshObject in meshObjects){
-            meshObject.pathTracerHandler = this;
-        }
+        
         ResetCurrSample();
     }
 
-    private void GetMeshInfo(List<MeshObject.Data> meshObjectDatas, List<Vector3> verts, List<int> tris){
-        foreach (MeshObject meshObject in meshObjects){
-            meshObjectDatas.Add(meshObject.GetData(verts, tris));
-        }
-    }
+    
     private void SaveRender(){
         if (fileName == "") return;
 
@@ -180,5 +153,15 @@ public class PathTracerHandler : MonoBehaviour
 
     private void OnApplicationQuit() {
         pixelsCB.Release();
+        BVHCB.Release();
+    }
+    private void OnDrawGizmos() {
+        if (!showBVH || debug is null) return;
+        Gizmos.color = Color.black;
+
+        foreach (BVHNode node in debug){
+            Vector3 center = node.box.GetCenter();
+            Gizmos.DrawWireCube(center, node.box.GetDims());
+        }
     }
 }
