@@ -13,11 +13,12 @@ public struct BVHNode
     int left;
     int right;
 
-    Material mat;
+    int matIndex;
 
-    public static List<BVHNode> ConstructBVH(List<MeshObj> objs){
+    public static List<BVHNode> ConstructBVH(MeshObj[] objs){
         List<BVHNode> triangles = new List<BVHNode>();
         
+        int matIndex = 0;
         foreach (MeshObj obj in objs){
             Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
             Vector3[] verts = mesh.vertices;
@@ -35,8 +36,9 @@ public struct BVHNode
                 Vector3 v2 = 
                 Vector3Extensions.MultiplyComps(verts[tris[i+2]].Rotate(objRotation), objScale) + objPos;
 
-                triangles.Add(new BVHNode(new Triangle(v0, v1, v2), obj.GetMaterial())); 
+                triangles.Add(new BVHNode(new Triangle(v0, v1, v2), matIndex)); 
             }
+            matIndex++;
         }
         
         List<BVHNode> BVH = new List<BVHNode>();
@@ -83,13 +85,13 @@ public struct BVHNode
         return thisIndex;
     }
 
-    private BVHNode(Triangle triangle, Material mat){
+    private BVHNode(Triangle triangle, int matIndex){
         this.isBox = 0;
         this.triangle = triangle;
         this.box = new AABB(triangle);
         this.left = -1;
         this.right = -1;
-        this.mat = mat;
+        this.matIndex = matIndex;
     }
     private BVHNode(AABB box){
         this.isBox = 1;
@@ -97,7 +99,7 @@ public struct BVHNode
         this.box = box;
         this.left = -1;
         this.right = -1;
-        this.mat = new Material();
+        this.matIndex = -1;
     }
 
     private struct Comparer : IComparer<BVHNode>{

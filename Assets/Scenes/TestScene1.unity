@@ -178,6 +178,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: bunny
       objectReference: {fileID: 0}
+    - target: {fileID: 1690857939711830436, guid: 22b992b19f798d24e9e579547737dcc5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22b992b19f798d24e9e579547737dcc5, type: 3}
 --- !u!1 &375460913 stripped
@@ -315,9 +319,6 @@ MonoBehaviour:
   samples: 10000
   currSample: 1
   showBVH: 0
-  objs:
-  - {fileID: 960192122}
-  - {fileID: 375460914}
 --- !u!114 &873623006
 MonoBehaviour:
   m_ObjectHideFlags: 0

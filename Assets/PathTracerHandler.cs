@@ -37,7 +37,9 @@ public class PathTracerHandler : MonoBehaviour
     [SerializeField] private bool showBVH;
     [Space]
     private ComputeBuffer pixelsCB;
-    [SerializeField] private List<MeshObj> objs;
+    private Material[] materials;
+    private ComputeBuffer materialsCB;
+    private MeshObj[] objs;
     private ComputeBuffer BVHCB;
     private List<BVHNode> BVH;
 
@@ -72,11 +74,20 @@ public class PathTracerHandler : MonoBehaviour
         pixelsCB = new ComputeBuffer((int)(width * height), 9 * sizeof(float));
         pixelsCB.SetData(pixels);
         pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
-    }
-    private void Start() {
+
+        objs = FindObjectsOfType<MeshObj>();
+
+        foreach (MeshObj obj in objs){
+            obj.pathTracer = this;
+        }
+
         BVH = BVHNode.ConstructBVH(objs);
 
-        BVHCB = new ComputeBuffer(BVH.Count, 24 * sizeof(float) + 3 * sizeof(int));
+        materials = new Material[objs.Length];
+        materialsCB = new ComputeBuffer(materials.Length, 9 * sizeof(float));
+        pathTracerCompute.SetBuffer(0, "materials", materialsCB);
+
+        BVHCB = new ComputeBuffer(BVH.Count, 15 * sizeof(float) + 4 * sizeof(int));
         BVHCB.SetData(BVH.ToArray());
 
         pathTracerCompute.SetBuffer(0, "BVH", BVHCB);
@@ -100,6 +111,11 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetTexture(0, "renderTex", renderTexture);
         pathTracerCompute.SetTexture(0, "normalsTex", normalsTexture);
         pathTracerCompute.SetTexture(0, "albedoTex", albedoTexture);
+
+        for (int i = 0; i < materials.Length; i++){
+            materials[i] = objs[i].GetMaterial();
+        }
+        materialsCB.SetData(materials);
 
         pathTracerCompute.Dispatch(0, (int)width / 30, (int)height / 30, 1);
     }
@@ -152,6 +168,7 @@ public class PathTracerHandler : MonoBehaviour
 
     private void OnApplicationQuit() {
         pixelsCB.Release();
+        materialsCB.Release();
         BVHCB.Release();
     }
     private void OnDrawGizmos() {

@@ -12,6 +12,8 @@ public class MeshObj : MonoBehaviour
     [SerializeField] [Range(0f, 1f)] private float roughness;
     [SerializeField] private Vector3 emission;
 
+    public PathTracerHandler pathTracer;
+
     public Material GetMaterial(){
         return new Material{
             albedo = new Vector3(this.albedo.r, this.albedo.g, this.albedo.b),
@@ -20,5 +22,9 @@ public class MeshObj : MonoBehaviour
             roughness = this.roughness,
             emission = this.emission
         };
+    }
+
+    private void OnValidate() {
+        if (pathTracer) pathTracer.ResetCurrSample();
     }
 }

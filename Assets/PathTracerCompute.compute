@@ -218,12 +218,13 @@ struct BVHNode{
     int left;
     int right;
 
-    Material mat;
+    int matIndex;
 };
 
 
 StructuredBuffer<BVHNode> BVH;
 uint BVHCount;
+StructuredBuffer<Material> materials;
 
 // -----------
 float3 SampleEnviroment(Ray ray){
@@ -258,7 +259,7 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
 
                 if (tempRec.didHit){
                     rec = tempRec;
-                    mat = node.mat;
+                    mat = materials[node.matIndex];
                 }
             }
             else if (node.box.Hit(ray, tMin, rec.t).didHit){

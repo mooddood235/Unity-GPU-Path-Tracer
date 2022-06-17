@@ -254,6 +254,7 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!64 &414729492
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -370,6 +371,7 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!65 &639762059
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -485,6 +487,7 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!64 &768965393
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -600,6 +603,7 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!4 &1031256875
 Transform:
   m_ObjectHideFlags: 0
@@ -702,6 +706,7 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 10, y: 10, z: 10}
+  pathTracer: {fileID: 0}
 --- !u!64 &1084402557
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -893,19 +898,7 @@ MonoBehaviour:
   seed: 0
   samples: 8000
   currSample: 1
-  showBVH: 1
-  objs:
-  - {fileID: 2130193839}
-  - {fileID: 768965392}
-  - {fileID: 1259942206}
-  - {fileID: 1138789631}
-  - {fileID: 414729491}
-  - {fileID: 1084402556}
-  - {fileID: 639762058}
-  - {fileID: 2099268756}
-  - {fileID: 2105618547}
-  - {fileID: 1031256874}
-  - {fileID: 1277208202}
+  showBVH: 0
 --- !u!114 &1101733808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -958,6 +951,7 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!64 &1138789632
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1074,6 +1068,7 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!64 &1259942207
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1189,6 +1184,7 @@ MonoBehaviour:
   metalness: 1
   roughness: 0.5
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!4 &1277208203
 Transform:
   m_ObjectHideFlags: 0
@@ -1291,6 +1287,7 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!65 &2099268757
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1405,6 +1402,7 @@ MonoBehaviour:
   metalness: 1
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!4 &2105618548
 Transform:
   m_ObjectHideFlags: 0
@@ -1586,3 +1584,4 @@ MonoBehaviour:
   metalness: 0
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
