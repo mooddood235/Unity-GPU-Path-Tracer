@@ -14,7 +14,7 @@ public class MeshObj : MonoBehaviour
 
     public Material GetMaterial(){
         return new Material{
-            albedo = this.albedo,
+            albedo = new Vector3(this.albedo.r, this.albedo.g, this.albedo.b),
             specChance = this.specChance,
             metalness = this.metalness,
             roughness = this.roughness,

@@ -39,7 +39,7 @@ public class PathTracerHandler : MonoBehaviour
     private ComputeBuffer pixelsCB;
     [SerializeField] private List<MeshObj> objs;
     private ComputeBuffer BVHCB;
-    private List<BVHNode> debug;
+    private List<BVHNode> BVH;
 
     private void Awake() {
         previousFileName = fileName;
@@ -74,8 +74,7 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
     }
     private void Start() {
-        debug = BVHNode.ConstructBVH(objs);
-        List<BVHNode.Blittable> BVH = BVHNode.ConvertToBlittable(debug);
+        BVH = BVHNode.ConstructBVH(objs);
 
         BVHCB = new ComputeBuffer(BVH.Count, 24 * sizeof(float) + 3 * sizeof(int));
         BVHCB.SetData(BVH.ToArray());
@@ -156,10 +155,10 @@ public class PathTracerHandler : MonoBehaviour
         BVHCB.Release();
     }
     private void OnDrawGizmos() {
-        if (!showBVH || debug is null) return;
+        if (!showBVH || BVH is null) return;
         Gizmos.color = Color.black;
 
-        foreach (BVHNode node in debug){
+        foreach (BVHNode node in BVH){
             Vector3 center = node.box.GetCenter();
             Gizmos.DrawWireCube(center, node.box.GetDims());
         }

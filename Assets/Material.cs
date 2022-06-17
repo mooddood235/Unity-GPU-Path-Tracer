@@ -4,7 +4,7 @@ using UnityEngine;
 
 public struct Material
 {
-    public Color albedo;
+    public Vector3 albedo;
     public float specChance;
     public float metalness;
     public float roughness;

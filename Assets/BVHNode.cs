@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BVHNode
+public struct BVHNode
 {
     int isBox;
 
@@ -70,12 +70,15 @@ public class BVHNode
 
         triangles.Sort(start, count, comparer);
 
-        BVH.Add(new BVHNode(box));
+        BVHNode thisNode = new BVHNode(box);
+        BVH.Add(thisNode);
 
         int mid = start + count / 2;
 
-        BVH[thisIndex].left = ConstructBVH(BVH, triangles, start, mid);
-        BVH[thisIndex].right = ConstructBVH(BVH, triangles, mid, end);
+        thisNode.left = ConstructBVH(BVH, triangles, start, mid);
+        thisNode.right = ConstructBVH(BVH, triangles, mid, end);
+
+        BVH[thisIndex] = thisNode;
 
         return thisIndex;
     }
@@ -90,59 +93,11 @@ public class BVHNode
     }
     private BVHNode(AABB box){
         this.isBox = 1;
+        this.triangle = new Triangle();
         this.box = box;
         this.left = -1;
         this.right = -1;
-    }
-
-    public static List<Blittable> ConvertToBlittable(List<BVHNode> nodes){
-        List<Blittable> blittableNodes = new List<Blittable>(nodes.Count);
-
-        foreach (BVHNode node in nodes){
-            blittableNodes.Add(new Blittable(node));
-        }
-
-        return blittableNodes;
-    }
-
-    public struct Blittable{
-        int isBox;
-
-        Vector3 v0;
-        Vector3 v1;
-        Vector3 v2;
-
-        Vector3 min;
-        Vector3 max;
-
-        int left;
-        int right;
-
-        Vector3 albedo;
-        float specChance;
-        float metalness;
-        float roughness;
-        Vector3 emission;
-
-        public Blittable(BVHNode node){
-            this.isBox = node.isBox;
-
-            this.v0 = node.triangle.v0;
-            this.v1 = node.triangle.v1;
-            this.v2 = node.triangle.v2;
-
-            this.min = node.box.min;
-            this.max = node.box.max;
-
-            this.left = node.left;
-            this.right = node.right;
-
-            this.albedo = new Vector3(node.mat.albedo.r, node.mat.albedo.g, node.mat.albedo.b);
-            this.specChance = node.mat.specChance;
-            this.metalness = node.mat.metalness;
-            this.roughness = node.mat.roughness;
-            this.emission = node.mat.emission;
-        }
+        this.mat = new Material();
     }
 
     private struct Comparer : IComparer<BVHNode>{
