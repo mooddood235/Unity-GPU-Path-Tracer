@@ -17,13 +17,11 @@ public struct AABB
             Mathf.Min(Mathf.Min(triangle.v0.y, triangle.v1.y), triangle.v2.y),
             Mathf.Min(Mathf.Min(triangle.v0.z, triangle.v1.z), triangle.v2.z)
         );
-        this.min -= Vector3.one * 0.0001f;
         this.max = new Vector3(
             Mathf.Max(Mathf.Max(triangle.v0.x, triangle.v1.x), triangle.v2.x),
             Mathf.Max(Mathf.Max(triangle.v0.y, triangle.v1.y), triangle.v2.y),
             Mathf.Max(Mathf.Max(triangle.v0.z, triangle.v1.z), triangle.v2.z)
         );
-        this.max += Vector3.one * 0.0001f;
     }
     public Vector3 GetDims(){
         return new Vector3(max.x - min.x, max.y - min.y, max.z - min.z);

@@ -18,14 +18,13 @@ public class Controller : MonoBehaviour
         Zoom();
     }
     private void Transform(){
-        transform.position += (transform.right * -horizontal + transform.up * -vertical)
-         * Time.deltaTime * transformSensitivity;
+        transform.position += (transform.right * -horizontal + transform.up * -vertical) * transformSensitivity;
     }
     private void Rotate(){
-        transform.Rotate(-vertical * Time.deltaTime * rotateSensitivity, 0, 0, Space.Self);
-        transform.Rotate(0, horizontal * Time.deltaTime * rotateSensitivity, 0, Space.World);
+        transform.Rotate(-vertical * rotateSensitivity, 0, 0, Space.Self);
+        transform.Rotate(0, horizontal * rotateSensitivity, 0, Space.World);
     }
     private void Zoom(){
-        transform.position += transform.forward * Input.mouseScrollDelta.y * Time.deltaTime * zoomSensitivity;
+        transform.position += transform.forward * Input.mouseScrollDelta.y * zoomSensitivity;
     }
 }

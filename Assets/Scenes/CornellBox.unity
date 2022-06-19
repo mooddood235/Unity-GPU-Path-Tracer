@@ -894,7 +894,7 @@ MonoBehaviour:
   useColor: 1
   width: 600
   height: 600
-  maxDepth: 50
+  maxDepth: 5
   seed: 0
   samples: 8000
   currSample: 1
@@ -911,9 +911,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd315efb6c42eeb44b7bcc0abece643f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  transformSensitivity: 200
-  rotateSensitivity: 200
-  zoomSensitivity: 30
+  transformSensitivity: 1
+  rotateSensitivity: 1
+  zoomSensitivity: 1
 --- !u!1 &1138789630
 GameObject:
   m_ObjectHideFlags: 0
