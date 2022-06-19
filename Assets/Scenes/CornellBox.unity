@@ -892,9 +892,9 @@ MonoBehaviour:
   enviromentTexture: {fileID: 2800000, guid: 926961ad77bc6824ea5ce0f07c684df0, type: 3}
   enviromentColor: {r: 0, g: 0, b: 0, a: 0}
   useColor: 1
-  width: 600
-  height: 600
-  maxDepth: 5
+  width: 1080
+  height: 1080
+  maxDepth: 6
   seed: 0
   samples: 8000
   currSample: 1

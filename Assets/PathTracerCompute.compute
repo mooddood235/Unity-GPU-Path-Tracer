@@ -239,6 +239,10 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
     float3 normal = 0.0f;
     float3 albedo = 0.0f;
 
+    int stack[100];
+    int stackPnt = 0;
+    stack[stackPnt] = 0;
+
     for (uint depth = 1; depth <= maxDepth; depth++){
         HitRecord rec;
         rec.didHit = false;
@@ -246,8 +250,7 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
 
         Material mat;
 
-        int stack[100];
-        int stackPnt = 0;
+        stackPnt = 0;
         stack[stackPnt] = 0;
 
         while (stackPnt >= 0){
@@ -278,6 +281,14 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
             color *= SampleEnviroment(ray);
             break;
         }
+        if (depth == maxDepth){
+            color = 0.0f;
+            break;
+        }
+        if (depth == 1){
+            normal = rec.normal;
+            albedo = mat.albedo;
+        }
         
         float3 newDir;
         float3 specularDir = reflect(ray.dir, rec.normal) + mat.roughness * RandInUnitSphere();
@@ -298,10 +309,6 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
         }
 
         color *= mat.emission + attenuation;
-        if (depth == 1){
-            normal = rec.normal;
-            albedo = mat.albedo;
-        }
         
         if (length(mat.emission) != 0.0f) break;
         ray = Ray::Create(rec.pos + rec.normal * 0.0001f, newDir);
