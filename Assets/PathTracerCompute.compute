@@ -333,7 +333,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     pixels[i][0] += colors[0];
     pixels[i][1] += colors[1];
     pixels[i][2] += colors[2];
-    renderTex[id.xy] = float4(pixels[i][0] / (float)currSample, 1);
+    renderTex[id.xy] = float4(pow(pixels[i][0] / (float)currSample, 1.0f/2.2f), 1);
     normalsTex[id.xy] = float4(pixels[i][1] / (float)currSample, 1);
     albedoTex[id.xy] = float4(pixels[i][2] / (float)currSample, 1);
+
 }
