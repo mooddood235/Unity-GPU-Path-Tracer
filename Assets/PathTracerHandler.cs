@@ -42,6 +42,9 @@ public class PathTracerHandler : MonoBehaviour
     private MeshObj[] objs;
     private ComputeBuffer BVHCB;
     private List<BVHNode> BVH;
+    private Sphere[] spheres;
+    private Sphere.Data[] sphereDatas;
+    ComputeBuffer spheresCB;
 
     private void Awake() {
         previousFileName = fileName;
@@ -85,13 +88,24 @@ public class PathTracerHandler : MonoBehaviour
 
         materials = new Material[objs.Length];
         materialsCB = new ComputeBuffer(materials.Length, 9 * sizeof(float));
-        pathTracerCompute.SetBuffer(0, "materials", materialsCB);
+        pathTracerCompute.SetBuffer(0, "meshObjMaterials", materialsCB);
 
         BVHCB = new ComputeBuffer(BVH.Count, 15 * sizeof(float) + 4 * sizeof(int));
         BVHCB.SetData(BVH.ToArray());
 
         pathTracerCompute.SetBuffer(0, "BVH", BVHCB);
         pathTracerCompute.SetInt("BVHCount", BVH.Count);
+
+        spheres = FindObjectsOfType<Sphere>();
+
+        foreach (Sphere sphere in spheres){
+            sphere.pathTracer = this;
+        }
+
+        sphereDatas = new Sphere.Data[spheres.Length];
+        spheresCB = new ComputeBuffer(spheres.Length + 1, 13 * sizeof(float));
+        pathTracerCompute.SetBuffer(0, "spheres", spheresCB);
+        pathTracerCompute.SetInt("sphereCount", spheres.Length);
     }
     private void Dispatch(){
         seed = (uint)Random.Range(200, 100000);
@@ -116,6 +130,11 @@ public class PathTracerHandler : MonoBehaviour
             materials[i] = objs[i].GetMaterial();
         }
         materialsCB.SetData(materials);
+
+        for (int i = 0; i < spheres.Length; i++){
+            sphereDatas[i] = spheres[i].GetData();
+        }
+        spheresCB.SetData(sphereDatas);
 
         pathTracerCompute.Dispatch(0, (int)width / 30, (int)height / 30, 1);
     }
@@ -170,6 +189,7 @@ public class PathTracerHandler : MonoBehaviour
         pixelsCB.Release();
         materialsCB.Release();
         BVHCB.Release();
+        spheresCB.Release();
     }
     private void OnDrawGizmos() {
         if (!showBVH || BVH is null) return;

@@ -117,6 +117,37 @@ struct HitRecord{
     float3 pos;
     float3 normal;
 };
+struct Material{
+    float3 albedo;
+    float specChance;
+    float metalness;
+    float roughness;
+    float3 emission;
+};
+class Sphere{
+    float3 center;
+    float radius;
+    Material mat;
+
+    HitRecord Hit(Ray ray, float tMin, float tMax){
+        float3 oc = ray.origin - center;
+        float a = dot(ray.dir, ray.dir);
+        float half_b = dot(oc, ray.dir);
+        float c = dot(oc, oc) - radius * radius;
+        float discriminant = half_b * half_b - a * c;
+        float root = (-half_b - sqrt(discriminant)) / a;
+        HitRecord rec;
+        if (discriminant < 0.0f || root < tMin || root > tMax){
+            rec.didHit = false;
+            return rec;
+        }
+        rec.didHit = true;
+        rec.t = root;
+        rec.pos = ray.At(rec.t);
+        rec.normal = (rec.pos - center) / radius;
+        return rec;
+    }
+};
 
 class Triangle{
     float3 vert0;
@@ -200,14 +231,6 @@ struct AABB{
     }
 };
 
-struct Material{
-    float3 albedo;
-    float specChance;
-    float metalness;
-    float roughness;
-    float3 emission;
-};
-
 struct BVHNode{
     int isBox;
 
@@ -221,12 +244,14 @@ struct BVHNode{
     int matIndex;
 };
 
+StructuredBuffer<Sphere> spheres;
+uint sphereCount;
 
 StructuredBuffer<BVHNode> BVH;
 uint BVHCount;
-StructuredBuffer<Material> materials;
+StructuredBuffer<Material> meshObjMaterials;
 
-// -----------
+// -----------d
 float3 SampleEnviroment(Ray ray){
     float theta = acos(ray.dir.y) / -PI;
     float phi = atan2(ray.dir.x, -ray.dir.z) / -PI * 0.5f;
@@ -250,6 +275,16 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
 
         Material mat;
 
+        for (int i = 0; i < sphereCount; i++){
+            Sphere sphere = spheres[i];
+            HitRecord tempRec = sphere.Hit(ray, tMin, rec.t);
+
+            if (tempRec.didHit){
+                rec = tempRec;
+                mat = sphere.mat;
+            }
+        }
+
         stackPnt = 0;
         stack[stackPnt] = 0;
 
@@ -262,7 +297,7 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
 
                 if (tempRec.didHit){
                     rec = tempRec;
-                    mat = materials[node.matIndex];
+                    mat = meshObjMaterials[node.matIndex];
                 }
             }
             else if (node.box.Hit(ray, tMin, rec.t).didHit){
@@ -336,5 +371,4 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     renderTex[id.xy] = float4(pow(pixels[i][0] / (float)currSample, 1.0f/2.2f), 1);
     normalsTex[id.xy] = float4(pixels[i][1] / (float)currSample, 1);
     albedoTex[id.xy] = float4(pixels[i][2] / (float)currSample, 1);
-
 }

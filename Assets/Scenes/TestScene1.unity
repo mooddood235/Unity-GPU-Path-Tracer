@@ -140,7 +140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 264200457802106698, guid: 22b992b19f798d24e9e579547737dcc5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.94
+      value: -0.952
       objectReference: {fileID: 0}
     - target: {fileID: 264200457802106698, guid: 22b992b19f798d24e9e579547737dcc5, type: 3}
       propertyPath: m_LocalPosition.z
@@ -285,14 +285,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 873623001}
-  m_LocalRotation: {x: 0.12507348, y: 0, z: 0, w: 0.9921475}
-  m_LocalPosition: {x: 0, y: 1.288, z: -5.331}
+  m_LocalRotation: {x: 0.21285985, y: 0, z: 0, w: 0.9770828}
+  m_LocalPosition: {x: 0, y: 1.209, z: -3.176}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 14.37, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 24.58, y: 0, z: 0}
 --- !u!114 &873623005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -314,7 +314,7 @@ MonoBehaviour:
   enviromentColor: {r: 1, g: 1, b: 1, a: 0}
   useColor: 0
   width: 1920
-  height: 1080
+  height: 1920
   maxDepth: 5
   seed: 0
   samples: 10000

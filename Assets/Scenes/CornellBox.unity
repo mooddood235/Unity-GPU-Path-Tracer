@@ -578,7 +578,7 @@ GameObject:
   - component: {fileID: 1031256875}
   - component: {fileID: 1031256877}
   - component: {fileID: 1031256876}
-  - component: {fileID: 1031256874}
+  - component: {fileID: 1031256878}
   m_Layer: 0
   m_Name: LeftSphere
   m_TagString: Untagged
@@ -586,24 +586,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1031256874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1031256873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 1
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
-  pathTracer: {fileID: 0}
 --- !u!4 &1031256875
 Transform:
   m_ObjectHideFlags: 0
@@ -617,7 +599,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1031256876
 MeshRenderer:
@@ -669,6 +651,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1031256873}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1031256878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1031256873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478e9a042646f9043a87162234a8a477, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  albedo: {r: 1, g: 1, b: 1, a: 0}
+  specChance: 1
+  metalness: 0.35
+  roughness: 0
+  emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!1 &1084402555
 GameObject:
   m_ObjectHideFlags: 0
@@ -887,14 +887,14 @@ MonoBehaviour:
   saveRender: 0
   saveNormals: 0
   saveAlbedo: 0
-  fileName: Render.png
+  fileName: SampleRenders/CornellBox.png
   pathTracerCompute: {fileID: 7200000, guid: a7dfe1f3a73a5714b9e7fe71c5616211, type: 3}
   enviromentTexture: {fileID: 2800000, guid: 926961ad77bc6824ea5ce0f07c684df0, type: 3}
   enviromentColor: {r: 0, g: 0, b: 0, a: 0}
   useColor: 1
-  width: 1080
-  height: 1080
-  maxDepth: 5
+  width: 1920
+  height: 1920
+  maxDepth: 25
   seed: 0
   samples: 8000
   currSample: 1
@@ -1159,7 +1159,7 @@ GameObject:
   - component: {fileID: 1277208203}
   - component: {fileID: 1277208205}
   - component: {fileID: 1277208204}
-  - component: {fileID: 1277208202}
+  - component: {fileID: 1277208206}
   m_Layer: 0
   m_Name: MiddleSphere
   m_TagString: Untagged
@@ -1167,24 +1167,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1277208202
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1277208201}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 1
-  metalness: 1
-  roughness: 0.5
-  emission: {x: 0, y: 0, z: 0}
-  pathTracer: {fileID: 0}
 --- !u!4 &1277208203
 Transform:
   m_ObjectHideFlags: 0
@@ -1194,11 +1176,11 @@ Transform:
   m_GameObject: {fileID: 1277208201}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.074, y: 1.214, z: 3.645}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.25, y: 1.25, z: 1.25}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &1277208204
 MeshRenderer:
@@ -1250,6 +1232,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1277208201}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1277208206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277208201}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478e9a042646f9043a87162234a8a477, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  albedo: {r: 1, g: 1, b: 1, a: 0}
+  specChance: 1
+  metalness: 1
+  roughness: 0.5
+  emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!1 &2099268755
 GameObject:
   m_ObjectHideFlags: 0
@@ -1377,7 +1377,7 @@ GameObject:
   - component: {fileID: 2105618548}
   - component: {fileID: 2105618550}
   - component: {fileID: 2105618549}
-  - component: {fileID: 2105618547}
+  - component: {fileID: 2105618551}
   m_Layer: 0
   m_Name: RightSphere
   m_TagString: Untagged
@@ -1385,24 +1385,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2105618547
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2105618546}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 1
-  metalness: 1
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
-  pathTracer: {fileID: 0}
 --- !u!4 &2105618548
 Transform:
   m_ObjectHideFlags: 0
@@ -1416,7 +1398,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2105618549
 MeshRenderer:
@@ -1468,6 +1450,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2105618546}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &2105618551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2105618546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 478e9a042646f9043a87162234a8a477, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  albedo: {r: 1, g: 1, b: 1, a: 0}
+  specChance: 1
+  metalness: 1
+  roughness: 0
+  emission: {x: 0, y: 0, z: 0}
+  pathTracer: {fileID: 0}
 --- !u!1 &2130193834
 GameObject:
   m_ObjectHideFlags: 0
