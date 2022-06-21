@@ -90,7 +90,7 @@ public class PathTracerHandler : MonoBehaviour
         materialsCB = new ComputeBuffer(materials.Length, 9 * sizeof(float));
         pathTracerCompute.SetBuffer(0, "meshObjMaterials", materialsCB);
 
-        BVHCB = new ComputeBuffer(BVH.Count, 15 * sizeof(float) + 4 * sizeof(int));
+        BVHCB = new ComputeBuffer(BVH.Count, 24 * sizeof(float) + 4 * sizeof(int));
         BVHCB.SetData(BVH.ToArray());
 
         pathTracerCompute.SetBuffer(0, "BVH", BVHCB);

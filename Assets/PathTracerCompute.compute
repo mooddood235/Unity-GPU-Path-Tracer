@@ -154,6 +154,10 @@ class Triangle{
     float3 vert1;
     float3 vert2;
 
+    float3 normal0;
+    float3 normal1;
+    float3 normal2;
+
     HitRecord Hit(Ray ray, float tMin, float tMax){
         HitRecord rec;
         rec.didHit = false;
@@ -191,7 +195,13 @@ class Triangle{
         rec.didHit = true;
         rec.t = t;
         rec.pos = ray.At(t);
-        rec.normal = normalize(cross(vert1 - vert0, vert2 - vert0));
+        //rec.normal = normalize(cross(vert1 - vert0, vert2 - vert0));
+
+        float w = 1.0f - u - v;
+
+        rec.normal = normal0 * w + normal1 * u + normal2 * v;
+        rec.normal = normalize(rec.normal);
+
         return rec;
     }
 
@@ -275,7 +285,7 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
 
         Material mat;
 
-        for (int i = 0; i < sphereCount; i++){
+        for (uint i = 0; i < sphereCount; i++){
             Sphere sphere = spheres[i];
             HitRecord tempRec = sphere.Hit(ray, tMin, rec.t);
 
@@ -342,9 +352,9 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
             newDir = diffuseDir;
             attenuation = mat.albedo;
         }
-
-        color *= mat.emission + attenuation;
         
+        color *= mat.emission + attenuation;
+
         if (length(mat.emission) != 0.0f) break;
         ray = Ray::Create(rec.pos + rec.normal * 0.0001f, newDir);
     }
