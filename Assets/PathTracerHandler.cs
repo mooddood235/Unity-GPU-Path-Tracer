@@ -119,6 +119,7 @@ public class PathTracerHandler : MonoBehaviour
 
         foreach (Sphere sphere in spheres){
             sphere.pathTracer = this;
+            sphere.mat.pathTracer = this;
         }
 
         sphereDatas = new Sphere.Data[spheres.Length];

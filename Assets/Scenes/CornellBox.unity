@@ -249,12 +249,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
 --- !u!64 &414729492
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -366,12 +362,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
 --- !u!65 &639762059
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -482,12 +474,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 0, b: 0, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: 4fcc3217b775c7e4e95db368483d681f, type: 2}
 --- !u!64 &768965393
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -663,12 +651,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 478e9a042646f9043a87162234a8a477, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 1
-  metalness: 0.35
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: eea75e430b8fd3d4899f745353a0f396, type: 2}
 --- !u!1 &1084402555
 GameObject:
   m_ObjectHideFlags: 0
@@ -701,12 +685,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 10, y: 10, z: 10}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: 634170182d69ab84cb4bcd6903bb8d17, type: 2}
 --- !u!64 &1084402557
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -946,12 +926,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
 --- !u!64 &1138789632
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1063,12 +1039,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 0, g: 1, b: 0, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: d42a9722a4939764aafd329f733b4221, type: 2}
 --- !u!64 &1259942207
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1244,12 +1216,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 478e9a042646f9043a87162234a8a477, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 1
-  metalness: 1
-  roughness: 0.5
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: 480a5467bc30b724a832dc99cf24b9e7, type: 2}
 --- !u!1 &2099268755
 GameObject:
   m_ObjectHideFlags: 0
@@ -1282,12 +1250,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
 --- !u!65 &2099268757
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1462,12 +1426,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 478e9a042646f9043a87162234a8a477, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 1
-  metalness: 1
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: 0f64b7b793d07614591f5c5fdba64bd7, type: 2}
 --- !u!1 &2130193834
 GameObject:
   m_ObjectHideFlags: 0
@@ -1579,9 +1539,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 1, g: 1, b: 1, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
