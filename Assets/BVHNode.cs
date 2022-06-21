@@ -18,7 +18,6 @@ public struct BVHNode
     public static List<BVHNode> ConstructBVH(MeshObj[] objs){
         List<BVHNode> triangles = new List<BVHNode>();
         
-        int matIndex = 0;
         foreach (MeshObj obj in objs){
             Mesh mesh = obj.GetComponent<MeshFilter>().mesh;
             Vector3[] verts = mesh.vertices;
@@ -41,9 +40,8 @@ public struct BVHNode
                 Vector3 n1 = normals[tris[i + 1]].Rotate(objRotation);
                 Vector3 n2 = normals[tris[i + 2]].Rotate(objRotation);
 
-                triangles.Add(new BVHNode(new Triangle(v0, v1, v2, n0, n1, n2), matIndex)); 
+                triangles.Add(new BVHNode(new Triangle(v0, v1, v2, n0, n1, n2), obj.mat.matIndex)); 
             }
-            matIndex++;
         }
         
         List<BVHNode> BVH = new List<BVHNode>();

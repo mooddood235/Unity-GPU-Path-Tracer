@@ -6,5 +6,5 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class MeshObj : RenderObject
 {
-
+    
 }

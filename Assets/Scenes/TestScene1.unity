@@ -201,12 +201,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 0, g: 1, b: 0.7945039, a: 0}
-  specChance: 1
-  metalness: 0.3
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: 8cdea2e4fb11dc6448accf59975299de, type: 2}
 --- !u!1 &873623001
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,12 +363,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dec0c1350e81084c9105666d3e8d8c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  albedo: {r: 0.16981131, g: 0.16981131, b: 0.16981131, a: 0}
-  specChance: 0
-  metalness: 0
-  roughness: 0
-  emission: {x: 0, y: 0, z: 0}
   pathTracer: {fileID: 0}
+  mat: {fileID: 11400000, guid: f8dd36b771337394b970edb537b23b7d, type: 2}
 --- !u!64 &960192123
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -37,14 +37,16 @@ public class PathTracerHandler : MonoBehaviour
     [SerializeField] private bool showBVH;
     [Space]
     private ComputeBuffer pixelsCB;
-    private Material[] materials;
-    private ComputeBuffer materialsCB;
     private MeshObj[] objs;
     private ComputeBuffer BVHCB;
     private List<BVHNode> BVH;
     private Sphere[] spheres;
     private Sphere.Data[] sphereDatas;
-    ComputeBuffer spheresCB;
+    ComputeBuffer spheresCB;    
+    private List<Material> materials;
+    private Material.Data[] materialDatas;
+    private ComputeBuffer materialsCB;
+
 
     private void Awake() {
         previousFileName = fileName;
@@ -82,13 +84,30 @@ public class PathTracerHandler : MonoBehaviour
 
         foreach (MeshObj obj in objs){
             obj.pathTracer = this;
+            obj.mat.pathTracer = this;
         }
 
-        BVH = BVHNode.ConstructBVH(objs);
+        materials = new List<Material>();
 
-        materials = new Material[objs.Length];
-        materialsCB = new ComputeBuffer(materials.Length, 9 * sizeof(float));
-        pathTracerCompute.SetBuffer(0, "meshObjMaterials", materialsCB);
+        foreach (MeshObj obj in objs){
+            int matIndex = materials.IndexOf(obj.mat);
+            if (matIndex == -1){
+                materials.Add(obj.mat);
+                matIndex = materials.Count - 1;
+            }
+            obj.mat.matIndex = matIndex;
+        }
+        materialDatas = new Material.Data[materials.Count];
+
+        for (int i = 0; i < materials.Count; i++){
+            materialDatas[i] = materials[i].GetData();
+        }
+
+        materialsCB = new ComputeBuffer(materialDatas.Length, 9 * sizeof(float));
+        materialsCB.SetData(materialDatas);
+        pathTracerCompute.SetBuffer(0, "materials", materialsCB);
+
+        BVH = BVHNode.ConstructBVH(objs);
 
         BVHCB = new ComputeBuffer(BVH.Count, 24 * sizeof(float) + 4 * sizeof(int));
         BVHCB.SetData(BVH.ToArray());
@@ -105,7 +124,7 @@ public class PathTracerHandler : MonoBehaviour
         sphereDatas = new Sphere.Data[spheres.Length];
         spheresCB = new ComputeBuffer(spheres.Length + 1, 13 * sizeof(float));
         pathTracerCompute.SetBuffer(0, "spheres", spheresCB);
-        pathTracerCompute.SetInt("sphereCount", spheres.Length);
+        pathTracerCompute.SetInt("sphereCount", spheres.Length);    
     }
     private void Dispatch(){
         seed = (uint)Random.Range(200, 100000);
@@ -126,10 +145,10 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetTexture(0, "normalsTex", normalsTexture);
         pathTracerCompute.SetTexture(0, "albedoTex", albedoTexture);
 
-        for (int i = 0; i < materials.Length; i++){
-            materials[i] = objs[i].GetMaterial();
+        for (int i = 0; i < materials.Count; i++){
+            materialDatas[i] = materials[i].GetData();
         }
-        materialsCB.SetData(materials);
+        materialsCB.SetData(materialDatas);
 
         for (int i = 0; i < spheres.Length; i++){
             sphereDatas[i] = spheres[i].GetData();

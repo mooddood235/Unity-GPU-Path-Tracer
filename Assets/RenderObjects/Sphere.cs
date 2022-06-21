@@ -25,15 +25,15 @@ public class Sphere : RenderObject
         return new Data(
         this.transform.position,
         Mathf.Max(Mathf.Max(this.transform.localScale.x, this.transform.localScale.y), this.transform.localScale.z) / 2f,
-        this.GetMaterial()
+        this.mat.GetData()
         );
     }
     public struct Data{
         Vector3 pos;
         float radius;
-        Material mat;
+        Material.Data mat;
 
-        public Data(Vector3 pos, float radius, Material mat){
+        public Data(Vector3 pos, float radius, Material.Data mat){
             this.pos = pos;
             this.radius = radius;
             this.mat = mat;

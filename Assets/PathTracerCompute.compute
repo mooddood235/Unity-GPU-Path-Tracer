@@ -259,7 +259,7 @@ uint sphereCount;
 
 StructuredBuffer<BVHNode> BVH;
 uint BVHCount;
-StructuredBuffer<Material> meshObjMaterials;
+StructuredBuffer<Material> materials;
 
 // -----------d
 float3 SampleEnviroment(Ray ray){
@@ -307,7 +307,7 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
 
                 if (tempRec.didHit){
                     rec = tempRec;
-                    mat = meshObjMaterials[node.matIndex];
+                    mat = materials[node.matIndex];
                 }
             }
             else if (node.box.Hit(ray, tMin, rec.t).didHit){
