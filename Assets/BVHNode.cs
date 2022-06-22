@@ -23,6 +23,7 @@ public struct BVHNode
             Vector3[] verts = mesh.vertices;
             int[] tris = mesh.triangles;
             Vector3[] normals = mesh.normals;
+            Vector2[] uvs = mesh.uv;
 
             for (int i = 0; i < tris.Length; i+=3){
                 Vector3 objRotation = obj.transform.root.eulerAngles;
@@ -40,7 +41,11 @@ public struct BVHNode
                 Vector3 n1 = normals[tris[i + 1]].Rotate(objRotation);
                 Vector3 n2 = normals[tris[i + 2]].Rotate(objRotation);
 
-                triangles.Add(new BVHNode(new Triangle(v0, v1, v2, n0, n1, n2), obj.mat.matIndex)); 
+                Vector2 uv0 = uvs[tris[i]];
+                Vector2 uv1 = uvs[tris[i + 1]];
+                Vector2 uv2 = uvs[tris[i + 2]];
+
+                triangles.Add(new BVHNode(new Triangle(v0, v1, v2, n0, n1, n2, uv0, uv1, uv2), obj.mat.matIndex)); 
             }
         }
         

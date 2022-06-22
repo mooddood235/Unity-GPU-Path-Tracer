@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b70a3847fb10eb4aad20abc60a90ee2, type: 3}
   m_Name: FloorMat
   m_EditorClassIdentifier: 
-  albedo: {r: 0.18867922, g: 0.17710927, b: 0.17710927, a: 0}
+  albedoMap: {fileID: 2800000, guid: f6bd8d0452974ff408ec8b480fb9d8f8, type: 3}
+  albedo: {r: 0.88554645, g: 0.9433962, b: 0.93364114, a: 0}
   specChance: 0
-  metalness: 0
+  metalness: 1
   roughness: 0
   emission: {x: 0, y: 0, z: 0}
   matIndex: 1
+  albedoMapIndex: 0
   pathTracer: {fileID: 0}

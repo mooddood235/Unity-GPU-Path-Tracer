@@ -46,7 +46,8 @@ public class PathTracerHandler : MonoBehaviour
     private List<Material> materials;
     private Material.Data[] materialDatas;
     private ComputeBuffer materialsCB;
-
+    List<Texture2D> albedoMapList;
+    Texture2DArray albedoMaps;
 
     private void Awake() {
         previousFileName = fileName;
@@ -81,21 +82,38 @@ public class PathTracerHandler : MonoBehaviour
         pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
 
         objs = FindObjectsOfType<MeshObj>();
+        spheres = FindObjectsOfType<Sphere>();
 
         foreach (MeshObj obj in objs){
             obj.pathTracer = this;
             obj.mat.pathTracer = this;
         }
+        foreach (Sphere sphere in spheres){
+            sphere.pathTracer = this;
+            sphere.mat.pathTracer = this;
+        }
+
+        List<RenderObject> renderObjs = new List<RenderObject>();
+        renderObjs.AddRange(objs);
+        renderObjs.AddRange(spheres);
 
         materials = new List<Material>();
-
-        foreach (MeshObj obj in objs){
+        albedoMapList = new List<Texture2D>();
+        
+        foreach (RenderObject obj in renderObjs){
             int matIndex = materials.IndexOf(obj.mat);
             if (matIndex == -1){
                 materials.Add(obj.mat);
                 matIndex = materials.Count - 1;
             }
             obj.mat.matIndex = matIndex;
+
+            int albedoMapIndex = albedoMapList.IndexOf(obj.mat.albedoMap);
+            if (albedoMapIndex == -1 && obj.mat.albedoMap){
+                albedoMapList.Add(obj.mat.albedoMap);
+                albedoMapIndex = albedoMapList.Count - 1;
+            }
+            obj.mat.albedoMapIndex = albedoMapIndex;
         }
         materialDatas = new Material.Data[materials.Count];
 
@@ -103,29 +121,29 @@ public class PathTracerHandler : MonoBehaviour
             materialDatas[i] = materials[i].GetData();
         }
 
-        materialsCB = new ComputeBuffer(materialDatas.Length, 9 * sizeof(float));
+        materialsCB = new ComputeBuffer(materialDatas.Length, 9 * sizeof(float) + sizeof(int));
         materialsCB.SetData(materialDatas);
         pathTracerCompute.SetBuffer(0, "materials", materialsCB);
 
+        albedoMaps = new Texture2DArray(2048, 2048, albedoMapList.Count + 1, TextureFormat.RGBAFloat, 0, false);
+        for (int i = 0; i < albedoMapList.Count; i++){
+            albedoMaps.SetPixels(albedoMapList[i].GetPixels(), i, 0);
+        }
+        albedoMaps.Apply();
+        pathTracerCompute.SetTexture(0, "_albedoMaps", albedoMaps);
+
         BVH = BVHNode.ConstructBVH(objs);
 
-        BVHCB = new ComputeBuffer(BVH.Count, 24 * sizeof(float) + 4 * sizeof(int));
+        BVHCB = new ComputeBuffer(BVH.Count, 30 * sizeof(float) + 4 * sizeof(int));
         BVHCB.SetData(BVH.ToArray());
 
         pathTracerCompute.SetBuffer(0, "BVH", BVHCB);
         pathTracerCompute.SetInt("BVHCount", BVH.Count);
 
-        spheres = FindObjectsOfType<Sphere>();
-
-        foreach (Sphere sphere in spheres){
-            sphere.pathTracer = this;
-            sphere.mat.pathTracer = this;
-        }
-
         sphereDatas = new Sphere.Data[spheres.Length];
-        spheresCB = new ComputeBuffer(spheres.Length + 1, 13 * sizeof(float));
+        spheresCB = new ComputeBuffer(spheres.Length + 1, 4 * sizeof(float) + sizeof(int));
         pathTracerCompute.SetBuffer(0, "spheres", spheresCB);
-        pathTracerCompute.SetInt("sphereCount", spheres.Length);    
+        pathTracerCompute.SetInt("sphereCount", spheres.Length);   
     }
     private void Dispatch(){
         seed = (uint)Random.Range(200, 100000);

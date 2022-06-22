@@ -72,6 +72,8 @@ float4x4 cameraInverseProjection;
 float3 camPos;
 // ------------
 // Buffers and textures
+Texture2DArray _albedoMaps;
+SamplerState sampler_albedoMaps;
 Texture2D<float4> _enviromentTex;
 SamplerState sampler_enviromentTex;
 float3 enviromentColor;
@@ -116,6 +118,7 @@ struct HitRecord{
     float t;
     float3 pos;
     float3 normal;
+    float2 uv;
 };
 struct Material{
     float3 albedo;
@@ -123,11 +126,17 @@ struct Material{
     float metalness;
     float roughness;
     float3 emission;
+    int albedoMapIndex;
+
+    float3 GetAlbedo(float2 uv){
+        if (albedoMapIndex == -1) return albedo;
+        return _albedoMaps.SampleLevel(sampler_albedoMaps, float3(uv.x, uv.y, albedoMapIndex), 0);
+    }
 };
 class Sphere{
     float3 center;
     float radius;
-    Material mat;
+    int matIndex;
 
     HitRecord Hit(Ray ray, float tMin, float tMax){
         float3 oc = ray.origin - center;
@@ -145,6 +154,7 @@ class Sphere{
         rec.t = root;
         rec.pos = ray.At(rec.t);
         rec.normal = (rec.pos - center) / radius;
+        rec.uv = float2(asin(rec.normal.x)/PI + 0.5f, asin(rec.normal.y)/PI + 0.5f);
         return rec;
     }
 };
@@ -157,6 +167,10 @@ class Triangle{
     float3 normal0;
     float3 normal1;
     float3 normal2;
+
+    float2 uv0;
+    float2 uv1;
+    float2 uv2;
 
     HitRecord Hit(Ray ray, float tMin, float tMax){
         HitRecord rec;
@@ -201,6 +215,8 @@ class Triangle{
 
         rec.normal = normal0 * w + normal1 * u + normal2 * v;
         rec.normal = normalize(rec.normal);
+
+        rec.uv = uv0 * w + uv1 * u + uv2 * v;
 
         return rec;
     }
@@ -261,7 +277,7 @@ StructuredBuffer<BVHNode> BVH;
 uint BVHCount;
 StructuredBuffer<Material> materials;
 
-// -----------d
+// -----------
 float3 SampleEnviroment(Ray ray){
     float theta = acos(ray.dir.y) / -PI;
     float phi = atan2(ray.dir.x, -ray.dir.z) / -PI * 0.5f;
@@ -291,7 +307,7 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
 
             if (tempRec.didHit){
                 rec = tempRec;
-                mat = sphere.mat;
+                mat = materials[sphere.matIndex];
             }
         }
 
@@ -346,11 +362,11 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
 
         if (Rand() <= mat.specChance * specularIntensity){
             newDir = specularDir;
-            attenuation = lerp(1, mat.albedo, mat.metalness);
+            attenuation = lerp(1, mat.GetAlbedo(rec.uv), mat.metalness);
         }
         else{
             newDir = diffuseDir;
-            attenuation = mat.albedo;
+            attenuation = mat.GetAlbedo(rec.uv);
         }
         
         color *= mat.emission + attenuation;

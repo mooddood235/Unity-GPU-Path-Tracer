@@ -5,12 +5,14 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Material", menuName = "ScriptableObjects/Material")]
 public class Material : ScriptableObject
 {
+    public Texture2D albedoMap;
     public Color albedo;
     [Range(0f, 1f)] public float specChance;
     [Range(0f, 1f)] public float metalness;
     [Range(0f, 1f)] public float roughness;
     public Vector3 emission;
     [HideInInspector] public int matIndex;
+    [HideInInspector] public int albedoMapIndex;
     [HideInInspector] public PathTracerHandler pathTracer;
 
     public Data GetData(){
@@ -19,7 +21,8 @@ public class Material : ScriptableObject
             specChance = this.specChance,
             metalness = this.metalness,
             roughness = this.roughness,
-            emission = this.emission
+            emission = this.emission,
+            albedoMapIndex = this.albedoMapIndex
         };
     }
 
@@ -33,5 +36,6 @@ public class Material : ScriptableObject
         public float metalness;
         public float roughness;
         public Vector3 emission;
+        public int albedoMapIndex;
     }
 }

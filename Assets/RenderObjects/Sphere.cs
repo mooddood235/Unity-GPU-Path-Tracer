@@ -24,19 +24,17 @@ public class Sphere : RenderObject
     public Data GetData(){
         return new Data(
         this.transform.position,
-        Mathf.Max(Mathf.Max(this.transform.localScale.x, this.transform.localScale.y), this.transform.localScale.z) / 2f,
-        this.mat.GetData()
-        );
+        Mathf.Max(Mathf.Max(this.transform.localScale.x, this.transform.localScale.y), this.transform.localScale.z) / 2f, this.mat.matIndex);
     }
     public struct Data{
         Vector3 pos;
         float radius;
-        Material.Data mat;
+        int matIndex;
 
-        public Data(Vector3 pos, float radius, Material.Data mat){
+        public Data(Vector3 pos, float radius, int matIndex){
             this.pos = pos;
             this.radius = radius;
-            this.mat = mat;
+            this.matIndex = matIndex;
         }
     }
 }
