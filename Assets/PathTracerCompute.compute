@@ -74,6 +74,10 @@ float3 camPos;
 // Buffers and textures
 Texture2DArray _albedoMaps;
 SamplerState sampler_albedoMaps;
+
+Texture2DArray _normalMaps;
+SamplerState sampler_normalMaps;
+
 Texture2D<float4> _enviromentTex;
 SamplerState sampler_enviromentTex;
 float3 enviromentColor;
@@ -127,10 +131,16 @@ struct Material{
     float roughness;
     float3 emission;
     int albedoMapIndex;
+    int normalMapIndex;
 
     float3 GetAlbedo(float2 uv){
         if (albedoMapIndex == -1) return albedo;
-        return _albedoMaps.SampleLevel(sampler_albedoMaps, float3(uv.x, uv.y, albedoMapIndex), 0);
+        return _albedoMaps.SampleLevel(sampler_albedoMaps, float3(uv.x, uv.y, albedoMapIndex), 0) * albedo;
+    }
+    float3 GetNormal(float2 uv, HitRecord rec){
+        if (normalMapIndex == -1) return rec.normal;
+        float3 tsNormal = _normalMaps.SampleLevel(sampler_normalMaps, float3(uv.x, uv.y, normalMapIndex), 0);
+        return rec.normal * tsNormal.x + rec.normal * tsNormal.y + rec.normal * tsNormal.z;
     }
 };
 class Sphere{
@@ -346,9 +356,12 @@ float3x3 GetPixelColors(Ray ray, float tMin, float tMax){
             color = 0.0f;
             break;
         }
+
+        rec.normal = mat.GetNormal(rec.uv, rec);
+
         if (depth == 1){
             normal = rec.normal;
-            albedo = mat.albedo;
+            albedo = mat.GetAlbedo(rec.uv);
         }
         
         float3 newDir;

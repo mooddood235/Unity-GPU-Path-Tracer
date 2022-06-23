@@ -26,8 +26,8 @@ public struct BVHNode
             Vector2[] uvs = mesh.uv;
 
             for (int i = 0; i < tris.Length; i+=3){
-                Vector3 objRotation = obj.transform.root.eulerAngles;
-                Vector3 objScale = obj.transform.localScale;
+                Vector3 objRotation = obj.transform.rotation.eulerAngles;
+                Vector3 objScale = obj.transform.lossyScale;
                 Vector3 objPos = obj.transform.position;
 
                 Vector3 v0 = 

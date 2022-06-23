@@ -43,11 +43,16 @@ public class PathTracerHandler : MonoBehaviour
     private Sphere[] spheres;
     private Sphere.Data[] sphereDatas;
     ComputeBuffer spheresCB;    
+
     private List<Material> materials;
     private Material.Data[] materialDatas;
     private ComputeBuffer materialsCB;
+
     List<Texture2D> albedoMapList;
     Texture2DArray albedoMaps;
+
+    List<Texture2D> normalMapList;
+    Texture2DArray normalMaps;
 
     private void Awake() {
         previousFileName = fileName;
@@ -99,29 +104,37 @@ public class PathTracerHandler : MonoBehaviour
 
         materials = new List<Material>();
         albedoMapList = new List<Texture2D>();
-        
+        normalMapList = new List<Texture2D>();
+
         foreach (RenderObject obj in renderObjs){
             int matIndex = materials.IndexOf(obj.mat);
+            int albedoMapIndex = albedoMapList.IndexOf(obj.mat.albedoMap);
+            int normalMapIndex = normalMapList.IndexOf(obj.mat.normalMap);
+
             if (matIndex == -1){
                 materials.Add(obj.mat);
                 matIndex = materials.Count - 1;
             }
-            obj.mat.matIndex = matIndex;
-
-            int albedoMapIndex = albedoMapList.IndexOf(obj.mat.albedoMap);
             if (albedoMapIndex == -1 && obj.mat.albedoMap){
                 albedoMapList.Add(obj.mat.albedoMap);
                 albedoMapIndex = albedoMapList.Count - 1;
             }
+            if (normalMapIndex == -1 && obj.mat.normalMap){
+                normalMapList.Add(obj.mat.normalMap);
+                normalMapIndex = normalMapList.Count - 1;
+            }
+            obj.mat.matIndex = matIndex;
             obj.mat.albedoMapIndex = albedoMapIndex;
+            obj.mat.normalMapIndex = normalMapIndex;
         }
+
         materialDatas = new Material.Data[materials.Count];
 
         for (int i = 0; i < materials.Count; i++){
             materialDatas[i] = materials[i].GetData();
         }
 
-        materialsCB = new ComputeBuffer(materialDatas.Length, 9 * sizeof(float) + sizeof(int));
+        materialsCB = new ComputeBuffer(materialDatas.Length, 9 * sizeof(float) + 2 * sizeof(int));
         materialsCB.SetData(materialDatas);
         pathTracerCompute.SetBuffer(0, "materials", materialsCB);
 
@@ -131,6 +144,13 @@ public class PathTracerHandler : MonoBehaviour
         }
         albedoMaps.Apply();
         pathTracerCompute.SetTexture(0, "_albedoMaps", albedoMaps);
+
+        normalMaps = new Texture2DArray(2048, 2048, normalMapList.Count + 1, TextureFormat.RGBAFloat, 0, false);
+        for (int i = 0; i < normalMapList.Count; i++){
+            normalMaps.SetPixels(normalMapList[i].GetPixels(), i, 0);
+        }
+        normalMaps.Apply();
+        pathTracerCompute.SetTexture(0, "_normalMaps", normalMaps);
 
         BVH = BVHNode.ConstructBVH(objs);
 
