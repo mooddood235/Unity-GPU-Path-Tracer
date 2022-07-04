@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   albedoMap: {fileID: 0}
   normalMap: {fileID: 0}
-  albedo: {r: 0.10969208, g: 0.8018868, b: 0.3512753, a: 0}
+  albedo: {r: 0.10987812, g: 0.59063315, b: 0.83904356, a: 0}
   specChance: 1
   metalness: 0.3
   roughness: 0

@@ -4,6 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Transform))]
 [RequireComponent(typeof(MeshFilter))]
+
 public class MeshObj : RenderObject
 {
     

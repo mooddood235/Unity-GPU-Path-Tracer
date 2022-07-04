@@ -4,5 +4,14 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/CornellBox/CornellBox.unity
+    guid: bc060ad4d6fb6b946bef3265facc72bc
+  - enabled: 1
+    path: Assets/Scenes/Bunny/Bunny.unity
+    guid: 06d02f653e05b7147a128230c1a99cad
+  - enabled: 1
+    path: Assets/Scenes/Canon/Canon.unity
+    guid: c7a65ff6a8378a84dabd0eb8a54be78e
   m_configObjects: {}

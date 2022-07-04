@@ -36,6 +36,7 @@ public class PathTracerHandler : MonoBehaviour
     [Space]
     [SerializeField] private bool showBVH;
     [Space]
+    [SerializeField] private MaterialUIHandler matUIHandler;
     private ComputeBuffer pixelsCB;
     private MeshObj[] objs;
     private ComputeBuffer BVHCB;
@@ -55,6 +56,7 @@ public class PathTracerHandler : MonoBehaviour
     Texture2DArray normalMaps;
 
     private void Awake() {
+    
         previousFileName = fileName;
 
         pixels = new Matrix3x3[width * height];
@@ -228,7 +230,20 @@ public class PathTracerHandler : MonoBehaviour
         ResetCurrSample();
     }
 
-    
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape)){
+            Application.Quit();
+        }
+
+        RaycastHit hitRec;
+        Ray ray = this.cam.ScreenPointToRay(Input.mousePosition);
+        if (Input.GetMouseButtonDown(2) && Physics.Raycast(ray, out hitRec, Mathf.Infinity)){
+            Material mat = hitRec.collider.GetComponent<RenderObject>().mat;
+            matUIHandler.pathTracer = this;
+            matUIHandler.SetMat(mat);
+        }
+    }
+
     private void SaveRender(){
         if (fileName == "") return;
 

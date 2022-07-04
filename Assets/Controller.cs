@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class Controller : MonoBehaviour
 {
@@ -10,6 +12,7 @@ public class Controller : MonoBehaviour
     private float horizontal;
     private float vertical;
     private void Update() {
+        if (MouseOverUI()) return;
         horizontal = Input.GetAxis("Mouse X");
         vertical = Input.GetAxis("Mouse Y");
 
@@ -26,5 +29,18 @@ public class Controller : MonoBehaviour
     }
     private void Zoom(){
         transform.position += transform.forward * Input.mouseScrollDelta.y * zoomSensitivity;
+    }
+    private bool MouseOverUI(){
+        PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+        pointerEventData.position = Input.mousePosition;
+        List<RaycastResult> rayCastResults = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(pointerEventData, rayCastResults);
+
+        foreach (RaycastResult rayCastResult in rayCastResults){
+            if (rayCastResult.gameObject.layer == LayerMask.NameToLayer("UI")){
+                return true;
+            }
+        }
+        return false;
     }
 }
