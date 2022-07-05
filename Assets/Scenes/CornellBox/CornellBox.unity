@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -251,7 +251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathTracer: {fileID: 0}
-  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
+  mat: {fileID: 11400000, guid: 3370d26f5ea954b4284c69bbbd8d1113, type: 2}
 --- !u!64 &414729492
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -378,7 +378,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathTracer: {fileID: 0}
-  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
+  mat: {fileID: 11400000, guid: 97096bfcbd642834f8b1a4d6324e3460, type: 2}
 --- !u!23 &639762060
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1006,7 +1006,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathTracer: {fileID: 0}
-  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
+  mat: {fileID: 11400000, guid: efed766000504b54aba3df80113daeb2, type: 2}
 --- !u!64 &1138789632
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1523,6 +1523,7 @@ GameObject:
   - component: {fileID: 1754433110}
   - component: {fileID: 1754433109}
   - component: {fileID: 1754433113}
+  - component: {fileID: 1754433114}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1625,6 +1626,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad07e69e55e199f469b9fc955980f00f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &1754433114
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1754433108}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &1994770238
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1779,7 +1792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathTracer: {fileID: 0}
-  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
+  mat: {fileID: 11400000, guid: 5b03fb0a1344d6f41a9d4afd67c849c4, type: 2}
 --- !u!23 &2099268758
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2085,7 +2098,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathTracer: {fileID: 0}
-  mat: {fileID: 11400000, guid: dec85344f8a5f80458d50de936a7eca8, type: 2}
+  mat: {fileID: 11400000, guid: ce8e96ac36188aa48a46adda173ffd2b, type: 2}
 --- !u!64 &2130193840
 MeshCollider:
   m_ObjectHideFlags: 0

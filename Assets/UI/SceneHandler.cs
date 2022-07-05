@@ -11,6 +11,6 @@ public class SceneHandler : MonoBehaviour
         dropDown = this.GetComponent<TMPro.TMP_Dropdown>();
     }
     public void LoadScene(){
-        SceneManager.LoadScene(dropDown.value);
+        SceneManager.LoadScene(dropDown.value + 1);
     }
 }

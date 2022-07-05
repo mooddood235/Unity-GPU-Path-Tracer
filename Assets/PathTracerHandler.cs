@@ -26,8 +26,6 @@ public class PathTracerHandler : MonoBehaviour
     [SerializeField] private Color enviromentColor;
     [SerializeField] private bool useColor;
     [Space]
-    [SerializeField] private uint width;
-    [SerializeField] private uint height;
     [Space]
     [SerializeField] private uint maxDepth;
     [SerializeField] private uint seed;
@@ -56,10 +54,9 @@ public class PathTracerHandler : MonoBehaviour
     Texture2DArray normalMaps;
 
     private void Awake() {
-    
         previousFileName = fileName;
 
-        pixels = new Matrix3x3[width * height];
+        pixels = new Matrix3x3[ScreenData.width * ScreenData.height];
 
         currSample = 1;
 
@@ -69,22 +66,22 @@ public class PathTracerHandler : MonoBehaviour
         cam = GetComponent<Camera>();
         previousFocalLength = cam.focalLength;
 
-        renderTexture = new RenderTexture((int)width, (int)height, 0);
+        renderTexture = new RenderTexture((int)ScreenData.width, (int)ScreenData.height, 0);
         renderTexture.format = RenderTextureFormat.ARGBFloat;
         renderTexture.filterMode = FilterMode.Point;
         renderTexture.enableRandomWrite = true;
 
-        normalsTexture = new RenderTexture((int)width, (int)height, 0);
+        normalsTexture = new RenderTexture((int)ScreenData.width, (int)ScreenData.height, 0);
         normalsTexture.format = RenderTextureFormat.ARGBFloat;
         normalsTexture.filterMode = FilterMode.Point;
         normalsTexture.enableRandomWrite = true;
 
-        albedoTexture = new RenderTexture((int)width, (int)height, 0);
+        albedoTexture = new RenderTexture((int)ScreenData.width, (int)ScreenData.height, 0);
         albedoTexture.format = RenderTextureFormat.ARGBFloat;
         albedoTexture.filterMode = FilterMode.Point;
         albedoTexture.enableRandomWrite = true;
 
-        pixelsCB = new ComputeBuffer((int)(width * height), 9 * sizeof(float));
+        pixelsCB = new ComputeBuffer((int)(ScreenData.width * ScreenData.height), 9 * sizeof(float));
         pixelsCB.SetData(pixels);
         pathTracerCompute.SetBuffer(0, "pixels", pixelsCB);
 
@@ -169,8 +166,8 @@ public class PathTracerHandler : MonoBehaviour
     }
     private void Dispatch(){
         seed = (uint)Random.Range(200, 100000);
-        pathTracerCompute.SetInt("texWidth", (int)width);
-        pathTracerCompute.SetInt("texHeight", (int)height);
+        pathTracerCompute.SetInt("texWidth", (int)ScreenData.width);
+        pathTracerCompute.SetInt("texHeight", (int)ScreenData.height);
         pathTracerCompute.SetMatrix("cameraToWorld", cam.cameraToWorldMatrix);
         pathTracerCompute.SetMatrix("cameraInverseProjection", cam.projectionMatrix.inverse);
         pathTracerCompute.SetVector("camPos", transform.position);
@@ -196,7 +193,7 @@ public class PathTracerHandler : MonoBehaviour
         }
         spheresCB.SetData(sphereDatas);
 
-        pathTracerCompute.Dispatch(0, (int)width / 30, (int)height / 30, 1);
+        pathTracerCompute.Dispatch(0, (int)ScreenData.width / 30, (int)ScreenData.height / 30, 1);
     }
 
     public void ResetCurrSample(){
@@ -251,8 +248,8 @@ public class PathTracerHandler : MonoBehaviour
         if (saveNormals) RenderTexture.active = normalsTexture;
         else if (saveAlbedo) RenderTexture.active = albedoTexture;
 
-        Texture2D tex = new Texture2D((int)width, (int)height);
-        tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        Texture2D tex = new Texture2D((int)ScreenData.width, (int)ScreenData.height);
+        tex.ReadPixels(new Rect(0, 0, ScreenData.width, ScreenData.height), 0, 0);
         RenderTexture.active = null;
 
         System.IO.File.WriteAllBytes(fileName, tex.EncodeToPNG());
