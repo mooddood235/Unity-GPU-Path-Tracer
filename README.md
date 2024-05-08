@@ -1,2 +1,2 @@
-# 
-Executable can be downloaded here: https://mooddood235.itch.io/whittedraytracer
+# About and Executable
+https://mooddood235.itch.io/whittedraytracer
