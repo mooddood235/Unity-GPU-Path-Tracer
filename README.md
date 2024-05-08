@@ -14,7 +14,7 @@ A GPU accelerated path tracer built in Unity.
   - Final  
   - Albedo
   - Normal
-  - 
+    
 # Executable
 https://mooddood235.itch.io/whittedraytracer
 
